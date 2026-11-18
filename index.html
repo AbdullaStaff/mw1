@@ -290,6 +290,10 @@
 
     #hitmarker::before { transform: translate(-50%, -50%) rotate(45deg); }
     #hitmarker::after { transform: translate(-50%, -50%) rotate(-45deg); }
+    #hitmarker.shield::before, #hitmarker.shield::after {
+      background: var(--cod-cyan);
+      box-shadow: 0 0 10px var(--cod-cyan);
+    }
     #hitmarker.kill::before, #hitmarker.kill::after {
       background: var(--cod-red);
       box-shadow: 0 0 10px var(--cod-red);
@@ -332,14 +336,14 @@
       border-left: 4px solid var(--cod-cyan);
       border-radius: 6px;
       padding: 12px 16px;
-      width: 255px;
+      width: 265px;
       backdrop-filter: blur(6px);
     }
 
     #hud-operator-label {
       font-size: 0.74rem;
       font-weight: 700;
-      letter-spacing: 1.5px;
+      letter-spacing: 1.2px;
       color: var(--cod-cyan);
       margin-bottom: 2px;
     }
@@ -472,10 +476,10 @@
       border: 1px solid var(--hud-border);
       box-shadow: 0 24px 64px rgba(0, 0, 0, 0.85);
       border-radius: 12px;
-      padding: 24px 28px;
-      max-width: 780px;
+      padding: 22px 26px;
+      max-width: 800px;
       width: 100%;
-      max-height: 92vh;
+      max-height: 94vh;
       overflow-y: auto;
     }
 
@@ -484,37 +488,63 @@
       letter-spacing: 3px;
       color: var(--cod-cyan);
       font-weight: 700;
-      margin-bottom: 4px;
+      margin-bottom: 2px;
     }
 
     .game-title {
-      font-size: 2.15rem;
+      font-size: 2rem;
       font-weight: 700;
       letter-spacing: 2px;
       color: #ffffff;
-      margin-bottom: 14px;
+      margin-bottom: 12px;
     }
 
     .section-header-row {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 8px;
-      font-size: 0.82rem;
+      margin-bottom: 6px;
+      font-size: 0.8rem;
       letter-spacing: 1.5px;
       color: #94a3b8;
       font-weight: 700;
     }
 
+    /* Callsign Input Bar */
+    .callsign-bar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      border-radius: 8px;
+      padding: 8px 12px;
+      margin-bottom: 12px;
+    }
+
+    .callsign-input {
+      background: rgba(0, 0, 0, 0.55);
+      border: 1px solid rgba(56, 189, 248, 0.45);
+      color: #ffffff;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.95rem;
+      font-weight: 700;
+      padding: 6px 12px;
+      border-radius: 6px;
+      width: 220px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
     /* Mode Selector Grid */
     .mode-selector-grid {
       display: grid;
-      grid-template-columns: repeat(2, 1fr);
+      grid-template-columns: repeat(3, 1fr);
       gap: 10px;
-      margin-bottom: 14px;
+      margin-bottom: 12px;
     }
 
-    @media (max-width: 640px) {
+    @media (max-width: 720px) {
       .mode-selector-grid { grid-template-columns: 1fr; }
     }
 
@@ -522,7 +552,7 @@
       background: rgba(255, 255, 255, 0.04);
       border: 1.5px solid rgba(255, 255, 255, 0.14);
       border-radius: 8px;
-      padding: 11px 14px;
+      padding: 10px 12px;
       text-align: left;
       cursor: pointer;
       transition: all 0.15s ease;
@@ -539,14 +569,14 @@
     }
 
     .mode-card-title {
-      font-size: 0.98rem;
+      font-size: 0.92rem;
       font-weight: 700;
       color: #ffffff;
       margin-bottom: 2px;
     }
 
     .mode-card-desc {
-      font-size: 0.76rem;
+      font-size: 0.74rem;
       color: #cbd5e1;
       line-height: 1.3;
     }
@@ -556,7 +586,7 @@
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       gap: 10px;
-      margin-bottom: 14px;
+      margin-bottom: 12px;
     }
 
     @media (max-width: 640px) {
@@ -567,7 +597,7 @@
       background: rgba(255, 255, 255, 0.04);
       border: 1.5px solid rgba(255, 255, 255, 0.14);
       border-radius: 8px;
-      padding: 10px 12px;
+      padding: 9px 12px;
       cursor: pointer;
       transition: all 0.15s ease;
     }
@@ -583,33 +613,33 @@
 
     .op-badge {
       display: inline-block;
-      font-size: 0.68rem;
+      font-size: 0.66rem;
       font-weight: 700;
       padding: 2px 7px;
       border-radius: 4px;
-      margin-bottom: 4px;
+      margin-bottom: 3px;
       letter-spacing: 1px;
     }
 
     .op-name {
-      font-size: 1rem;
+      font-size: 0.98rem;
       font-weight: 700;
       color: #ffffff;
     }
 
     .op-perk {
-      font-size: 0.74rem;
+      font-size: 0.72rem;
       color: #cbd5e1;
       margin-top: 2px;
     }
 
-    /* Private Room & Callsign Box */
+    /* Private Room Box */
     .mp-panel {
       background: rgba(255, 255, 255, 0.03);
       border: 1px solid rgba(255, 255, 255, 0.12);
       border-radius: 8px;
-      padding: 12px 14px;
-      margin-bottom: 16px;
+      padding: 10px 14px;
+      margin-bottom: 14px;
     }
 
     .mp-row {
@@ -622,7 +652,7 @@
 
     .mp-code-display {
       font-family: 'JetBrains Mono', monospace;
-      font-size: 1.05rem;
+      font-size: 1rem;
       font-weight: 700;
       letter-spacing: 3px;
       color: var(--cod-amber);
@@ -640,13 +670,8 @@
       font-size: 0.9rem;
       padding: 7px 10px;
       border-radius: 6px;
-      width: 125px;
+      width: 118px;
       text-transform: uppercase;
-    }
-
-    .tactical-input:focus {
-      outline: none;
-      border-color: var(--cod-cyan);
     }
 
     .btn-secondary {
@@ -654,9 +679,9 @@
       border: 1px solid rgba(255, 255, 255, 0.24);
       color: #f8fafc;
       font-family: 'Chakra Petch', sans-serif;
-      font-size: 0.84rem;
+      font-size: 0.82rem;
       font-weight: 700;
-      padding: 8px 14px;
+      padding: 8px 12px;
       border-radius: 6px;
       cursor: pointer;
       letter-spacing: 1px;
@@ -668,16 +693,35 @@
       border-color: var(--cod-cyan);
     }
 
+    .btn-amber {
+      background: linear-gradient(90deg, #d97706, #f59e0b);
+      border: none;
+      color: #090d16;
+      font-family: 'Chakra Petch', sans-serif;
+      font-size: 0.84rem;
+      font-weight: 700;
+      padding: 8px 14px;
+      border-radius: 6px;
+      cursor: pointer;
+      letter-spacing: 1px;
+      box-shadow: 0 4px 16px rgba(245, 158, 11, 0.35);
+      transition: filter 0.15s ease;
+    }
+
+    .btn-amber:hover {
+      filter: brightness(1.1);
+    }
+
     .btn-primary {
       width: 100%;
       background: linear-gradient(90deg, #0284c7, #38bdf8);
       border: none;
       color: #04101a;
       font-family: 'Chakra Petch', sans-serif;
-      font-size: 1.05rem;
+      font-size: 1.02rem;
       font-weight: 700;
       letter-spacing: 2px;
-      padding: 13px 22px;
+      padding: 12px 22px;
       border-radius: 8px;
       cursor: pointer;
       box-shadow: 0 6px 24px rgba(56, 189, 248, 0.38);
@@ -697,7 +741,7 @@
     }
 
     #mp-status {
-      font-size: 0.76rem;
+      font-size: 0.74rem;
       color: #94a3b8;
       margin-top: 6px;
       font-family: 'JetBrains Mono', monospace;
@@ -821,7 +865,7 @@
         <div class="stat-pill" id="stat-primary-label">ZONE <span id="hud-wave">P1 (18S)</span></div>
         <div class="stat-pill" id="stat-secondary-label">ALIVE <span id="hud-enemies">100/100</span></div>
         <div class="stat-pill">STREAK <span id="hud-streak">0</span></div>
-        <div class="stat-pill">SCORE <span id="hud-score">0</span></div>
+        <div class="stat-pill" id="stat-score-label">SCORE <span id="hud-score">0</span></div>
       </div>
     </div>
 
@@ -915,15 +959,13 @@
       <div class="game-kicker">MULTI-DISTRICT URBAN COMBAT // 3D FPS</div>
       <div class="game-title">TASK FORCE VANGUARD</div>
 
-      <div class="mp-panel" style="margin-bottom:14px; padding:10px 14px;">
-        <div class="section-header-row" style="margin-bottom:4px;">
-          <span>0. OPERATOR CALLSIGN (PLAYER NAME)</span>
-          <span id="callsign-preview-badge" style="color:var(--cod-cyan)">ID: VANGUARD-1</span>
-        </div>
-        <div class="mp-row" style="margin-top:4px;">
-          <input type="text" id="player-name-input" class="tactical-input" style="width:240px; text-transform:uppercase;" maxlength="16" placeholder="ENTER CALLSIGN..." value="VANGUARD-1" />
-          <span style="font-size:0.75rem; color:#94a3b8;">Shown in HUD, Killfeed &amp; Squad Matches</span>
-        </div>
+      <div class="section-header-row">
+        <span>0. OPERATOR CALLSIGN (PLAYER NAME)</span>
+        <span id="callsign-preview" style="color:var(--cod-cyan)">ID: VANGUARD-1</span>
+      </div>
+      <div class="callsign-bar">
+        <input type="text" id="player-name-input" class="callsign-input" maxlength="16" placeholder="ENTER NAME..." value="VANGUARD-1" />
+        <span style="font-size:0.76rem; color:#94a3b8;">Shown in HUD, Killfeed &amp; Private Matches</span>
       </div>
 
       <div class="section-header-row">
@@ -933,11 +975,15 @@
       <div class="mode-selector-grid">
         <div class="mode-card selected" data-mode="BR">
           <div class="mode-card-title">BATTLE ROYALE (100 PLAYERS)</div>
-          <div class="mode-card-desc">100 combatants across 4 city districts. 100HP+50Shield bots battle each other, shrinking gas zone, last standing wins.</div>
+          <div class="mode-card-desc">100 combatants across 4 city districts. Bots battle each other, shrinking gas zone, last standing wins.</div>
+        </div>
+        <div class="mode-card" data-mode="TDM100">
+          <div class="mode-card-title">100-POINT DEATHMATCH</div>
+          <div class="mode-card-desc">Fast-paced urban skirmish — first to reach 100 points (+10 per elimination, +15 headshot) wins.</div>
         </div>
         <div class="mode-card" data-mode="SURVIVAL">
           <div class="mode-card-title">WAVE SURVIVAL</div>
-          <div class="mode-card-desc">Solo or squad defense against escalating waves of armored tactical squads.</div>
+          <div class="mode-card-desc">Solo or squad defense against escalating waves of hostile armored squads.</div>
         </div>
       </div>
 
@@ -965,18 +1011,18 @@
 
       <div class="mp-panel">
         <div class="section-header-row" style="margin-bottom:2px;">
-          <span>3. PRIVATE MATCH WITH FRIENDS (ROOM CODE)</span>
+          <span>3. PRIVATE MATCH WITH FRIENDS (ROOM CODE &amp; 100-POINT MATCH)</span>
           <button class="hud-mini-btn" id="lobby-admin-btn">ADMIN SANDBOX [H]</button>
         </div>
         <div class="mp-row">
-          <button class="btn-secondary" id="create-room-btn">CREATE PRIVATE MATCH</button>
+          <button class="btn-secondary" id="create-room-btn">CREATE ROOM</button>
           <div class="mp-code-display" id="room-code-box">-----</div>
-          <button class="btn-secondary" id="copy-code-btn">COPY CODE</button>
-          <span style="color:#64748b; font-size:0.8rem;">OR</span>
+          <button class="btn-secondary" id="copy-code-btn">COPY</button>
           <input type="text" id="join-code-input" class="tactical-input" maxlength="5" placeholder="CODE" />
-          <button class="btn-secondary" id="join-room-btn">JOIN FRIEND</button>
+          <button class="btn-secondary" id="join-room-btn">JOIN</button>
+          <button class="btn-amber" id="start-private-100-btn">START PRIVATE MATCH (100 PTS)</button>
         </div>
-        <div id="mp-status">Status: Ready — Deploy Solo or Create/Join a Private Match code with friends.</div>
+        <div id="mp-status">Status: Ready — Create/Join a Room or click START PRIVATE MATCH (100 PTS) to play to 100 points!</div>
       </div>
 
       <button class="btn-primary" id="deploy-btn">DEPLOY INTO COMBAT</button>
@@ -1014,7 +1060,7 @@
         </div>
         <div class="summary-stat">
           <div class="summary-num" id="final-score">0</div>
-          <div class="summary-lbl">COMBAT SCORE</div>
+          <div class="summary-lbl" id="final-score-lbl">COMBAT SCORE</div>
         </div>
       </div>
       <div class="action-btn-grid">
@@ -1086,13 +1132,14 @@
         osc.stop(now + 0.09);
       }
 
-      playHitmarker(isKill = false) {
+      playHitmarker(isKill = false, isShield = false) {
         if (!this.ctx) return;
         const now = this.ctx.currentTime;
         const osc = this.ctx.createOscillator();
         const gain = this.ctx.createGain();
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(isKill ? 1320 : 940, now);
+        osc.type = isShield ? 'triangle' : 'sine';
+        const startFreq = isKill ? 1320 : (isShield ? 1150 : 920);
+        osc.frequency.setValueAtTime(startFreq, now);
         osc.frequency.exponentialRampToValueAtTime(isKill ? 1760 : 620, now + 0.07);
         gain.gain.setValueAtTime(0.22, now);
         gain.gain.exponentialRampToValueAtTime(0.005, now + 0.075);
@@ -1124,7 +1171,7 @@
     const audio = new TacticalAudio();
 
     // =========================================================================
-    // 2. GAME CONFIGURATION, OPERATORS & SANDBOX-SAFE MULTIPLAYER
+    // 2. GAME CONFIGURATION, OPERATORS, CALLSIGN & SANDBOX-SAFE MULTIPLAYER
     // =========================================================================
     const OPERATORS = {
       GHOST: {
@@ -1185,15 +1232,24 @@
       infammo: false
     };
 
+    let savedCallsign = 'VANGUARD-1';
+    try {
+      const stored = localStorage.getItem('tfv_callsign');
+      if (stored && stored.trim()) savedCallsign = stored.trim().toUpperCase().slice(0, 16);
+    } catch (e) {}
+
     const gameState = {
       active: false,
       paused: false,
       gameOver: false,
       mode: 'BR',
       operator: 'GHOST',
-      playerName: localStorage.getItem('tfv_callsign') || 'VANGUARD-1',
+      playerName: savedCallsign,
       wave: 1,
       score: 0,
+      matchPoints: 0,
+      botLeaderPoints: 0,
+      targetPoints: 100,
       kills: 0,
       streak: 0,
       uavActive: false,
@@ -1206,6 +1262,11 @@
       brBotFightTimer: 2.2
     };
 
+    function getPlayerCallsign() {
+      const raw = (gameState.playerName || '').trim().toUpperCase();
+      return raw.length > 0 ? raw.slice(0, 16) : 'VANGUARD-1';
+    }
+
     const netState = {
       roomCode: '',
       isHost: false,
@@ -1214,11 +1275,6 @@
       peers: new Map(),
       lastSync: 0
     };
-
-    function getPlayerCallsign() {
-      const raw = (gameState.playerName || '').trim().toUpperCase();
-      return raw.length > 0 ? raw.slice(0, 16) : 'VANGUARD-1';
-    }
 
     function generateRoomCode() {
       const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
@@ -1242,7 +1298,12 @@
         if (typeof BroadcastChannel !== 'undefined') {
           netState.channel = new BroadcastChannel('tfv-room-' + code);
           netState.channel.onmessage = (ev) => handleNetMessage(ev.data);
-          broadcastNet({ type: 'HELLO', id: netState.playerId, op: gameState.operator, name: getPlayerCallsign() });
+          broadcastNet({
+            type: 'HELLO',
+            id: netState.playerId,
+            op: gameState.operator,
+            name: getPlayerCallsign()
+          });
           document.getElementById('mp-status').textContent = asHost
             ? `Status: Private Room ${code} Created by ${getPlayerCallsign()}! Share code with friends.`
             : `Status: ${getPlayerCallsign()} connected to Private Room ${code}!`;
@@ -1263,14 +1324,21 @@
 
     function handleNetMessage(msg) {
       if (!msg || msg.id === netState.playerId) return;
-      const peerName = (msg.name || msg.op || 'SQUADMATE').toUpperCase();
+      const peerName = (msg.name || msg.op || 'SQUADMATE').toUpperCase().slice(0, 16);
+
       if (msg.type === 'HELLO') {
         document.getElementById('mp-status').textContent = `Status: ${peerName} (${msg.op}) joined Room ${netState.roomCode}!`;
-        broadcastNet({ type: 'WELCOME', id: netState.playerId, op: gameState.operator, name: getPlayerCallsign() });
+        broadcastNet({
+          type: 'WELCOME',
+          id: netState.playerId,
+          op: gameState.operator,
+          name: getPlayerCallsign()
+        });
       } else if (msg.type === 'WELCOME') {
         document.getElementById('mp-status').textContent = `Status: Connected with ${peerName} (${msg.op}) in ${netState.roomCode}!`;
       } else if (msg.type === 'START_MATCH' && !gameState.active) {
-        gameState.mode = msg.mode || 'BR';
+        gameState.mode = msg.mode || 'TDM100';
+        selectModeCard(gameState.mode);
         startMatch();
       } else if (msg.type === 'STATE') {
         updateRemotePeer(msg);
@@ -1339,10 +1407,9 @@
         g.lineWidth = 3;
         g.strokeRect(2, 2, 252, 252);
       } else if (pattern === 'windows') {
-        g.fillStyle = lineColor;
         for (let y = 18; y < 236; y += 38) {
           for (let x = 20; x < 236; x += 42) {
-            g.fillStyle = Math.random() > 0.28 ? '#38bdf8' : '#0f172a';
+            g.fillStyle = Math.random() > 0.28 ? lineColor : '#0f172a';
             g.globalAlpha = Math.random() > 0.28 ? 0.55 : 0.85;
             g.fillRect(x, y, 22, 24);
           }
@@ -1383,7 +1450,6 @@
     groundMesh.receiveShadow = true;
     scene.add(groundMesh);
 
-    // City Road Boulevards
     const roadMat = new THREE.MeshStandardMaterial({ color: 0x0f172a, roughness: 0.9 });
     const dashMat = new THREE.MeshBasicMaterial({ color: 0xfacc15 });
 
@@ -1552,7 +1618,6 @@
     mag.position.set(0, -0.1, -0.05);
     mag.rotation.x = 0.22;
 
-    // Holographic Sight
     const holoFrame = new THREE.Mesh(new THREE.BoxGeometry(0.054, 0.044, 0.068), gunMatDark);
     holoFrame.position.set(0, 0.068, -0.02);
     const holoGlass = new THREE.Mesh(
@@ -1566,7 +1631,6 @@
     );
     holoDot.position.set(0, 0.068, -0.021);
 
-    // First-Person Arms & Gloves
     const rightArmFP = new THREE.Mesh(new THREE.BoxGeometry(0.075, 0.075, 0.34), sleeveMat);
     rightArmFP.position.set(0.05, -0.1, 0.18);
     const rightGloveFP = new THREE.Mesh(new THREE.BoxGeometry(0.068, 0.075, 0.09), gloveMat);
@@ -1609,7 +1673,7 @@
     viewmodelRoot.add(pistolMesh);
 
     // =========================================================================
-    // 6. UPGRADED 3D HUMANOID SOLDIER RIGS & FLOATING HEALTH/SHIELD BARS
+    // 6. 3D HUMANOID SOLDIERS + FLOATING 100 HP & 50 SHIELD OVERHEAD BARS
     // =========================================================================
     function buildCharacterMesh(operatorId = 'GHOST', isEnemy = true) {
       const op = OPERATORS[operatorId] || OPERATORS.GHOST;
@@ -1637,7 +1701,6 @@
         metalness: 0.35
       });
 
-      // Torso & Tactical Plate Carrier Vest
       const torso = new THREE.Mesh(new THREE.BoxGeometry(0.58, 0.76, 0.34), bodyMat);
       torso.position.y = 1.12;
       torso.castShadow = true;
@@ -1648,20 +1711,17 @@
       vest.castShadow = true;
       group.add(vest);
 
-      // Tactical Backpack
       const backpack = new THREE.Mesh(new THREE.BoxGeometry(0.42, 0.52, 0.22), darkMetalMat);
       backpack.position.set(0, 1.18, -0.25);
       backpack.castShadow = true;
       group.add(backpack);
 
-      // Shoulder Pauldrons
       const leftShoulder = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.24, 0.28), accentMat);
       leftShoulder.position.set(-0.38, 1.36, 0);
       const rightShoulder = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.24, 0.28), accentMat);
       rightShoulder.position.set(0.38, 1.36, 0);
       group.add(leftShoulder, rightShoulder);
 
-      // Articulated Arms
       const leftArm = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.54, 0.16), bodyMat);
       leftArm.position.set(-0.38, 1.02, 0.12);
       leftArm.rotation.x = -0.45;
@@ -1670,7 +1730,6 @@
       rightArm.rotation.x = -0.65;
       group.add(leftArm, rightArm);
 
-      // Combat Helmet & Glowing Tactical Visor
       const head = new THREE.Mesh(new THREE.BoxGeometry(0.36, 0.36, 0.38), helmetMat);
       head.position.y = 1.72;
       head.castShadow = true;
@@ -1687,7 +1746,6 @@
       visor.position.set(0, 1.72, 0.18);
       group.add(visor);
 
-      // Articulated Legs & Combat Boots
       const leftLeg = new THREE.Mesh(new THREE.BoxGeometry(0.21, 0.74, 0.23), bodyMat);
       leftLeg.position.set(-0.16, 0.37, 0);
       leftLeg.castShadow = true;
@@ -1704,7 +1762,6 @@
 
       group.add(leftLeg, rightLeg);
 
-      // Detailed Assault Rifle Prop
       const rifleGroup = new THREE.Group();
       const rBody = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.12, 0.68), darkMetalMat);
       const rMag = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.20, 0.10), accentMat);
@@ -1721,12 +1778,12 @@
       return group;
     }
 
-    // Floating 3D Overhead Health (100 HP) + Shield (50 Shield) & Nameplate Sprite
     function createOverheadStatusSprite(label, hp = 100, maxHp = 100, shield = 50, maxShield = 50, isSquadmate = false) {
       const c = document.createElement('canvas');
       c.width = 256;
-      c.height = 84;
+      c.height = 88;
       const ctx = c.getContext('2d');
+
       const tex = new THREE.CanvasTexture(c);
       tex.minFilter = THREE.LinearFilter;
 
@@ -1735,55 +1792,56 @@
         transparent: true,
         depthTest: false
       });
-      const sprite = new THREE.Sprite(mat);
-      sprite.scale.set(1.65, 0.54, 1);
-      sprite.position.set(0, 2.28, 0);
 
+      const sprite = new THREE.Sprite(mat);
+      sprite.scale.set(1.75, 0.6, 1);
+      sprite.position.set(0, 2.34, 0);
       sprite.userData = { canvas: c, ctx, tex, label, isSquadmate };
+
       updateOverheadStatusSprite(sprite, hp, maxHp, shield, maxShield, label);
       return sprite;
     }
 
     function updateOverheadStatusSprite(sprite, hp, maxHp, shield, maxShield, newLabel = null) {
       if (!sprite || !sprite.userData) return;
-      const { canvas, ctx, tex, isSquadmate } = sprite.userData;
+      const { canvas: c, ctx, tex, isSquadmate } = sprite.userData;
       if (newLabel) sprite.userData.label = newLabel;
       const label = sprite.userData.label;
 
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.clearRect(0, 0, c.width, c.height);
 
-      // Nameplate
-      ctx.font = 'bold 21px "JetBrains Mono", monospace';
-      ctx.textAlign = 'center';
+      // Nameplate Pill
+      ctx.fillStyle = 'rgba(11, 15, 23, 0.85)';
+      ctx.fillRect(14, 4, 228, 30);
+      ctx.strokeStyle = isSquadmate ? 'rgba(56, 189, 248, 0.75)' : 'rgba(239, 68, 68, 0.75)';
+      ctx.lineWidth = 2;
+      ctx.strokeRect(14, 4, 228, 30);
+
+      ctx.font = 'bold 17px "JetBrains Mono", monospace';
       ctx.fillStyle = isSquadmate ? '#38bdf8' : '#f8fafc';
-      ctx.shadowColor = 'rgba(0, 0, 0, 0.95)';
-      ctx.shadowBlur = 6;
-      ctx.fillText(label, 128, 24);
-      ctx.shadowBlur = 0;
+      ctx.textAlign = 'center';
+      ctx.fillText(label, 128, 25);
 
-      const barX = 28;
-      const barW = 200;
-
-      // Shield Bar (50 Shield - Cyan)
-      if (maxShield > 0) {
-        const shRatio = Math.max(0, Math.min(1, shield / maxShield));
-        ctx.fillStyle = 'rgba(15, 23, 42, 0.88)';
-        ctx.fillRect(barX - 2, 32, barW + 4, 13);
+      if (!isSquadmate) {
+        // Shield Bar (50 Shield) - Cyan
+        const shPct = Math.max(0, Math.min(1, shield / maxShield));
+        ctx.fillStyle = 'rgba(15, 23, 42, 0.9)';
+        ctx.fillRect(24, 38, 208, 12);
         ctx.fillStyle = '#38bdf8';
-        ctx.fillRect(barX, 34, barW * shRatio, 9);
+        ctx.fillRect(26, 40, 204 * shPct, 8);
+
+        // Health Bar (100 HP) - Green / Amber / Red
+        const hpPct = Math.max(0, Math.min(1, hp / maxHp));
+        ctx.fillStyle = 'rgba(15, 23, 42, 0.9)';
+        ctx.fillRect(24, 53, 208, 14);
+        ctx.fillStyle = hpPct > 0.5 ? '#22c55e' : (hpPct > 0.25 ? '#f59e0b' : '#ef4444');
+        ctx.fillRect(26, 55, 204 * hpPct, 10);
+
+        // Numeric Readout
+        ctx.font = 'bold 12px "JetBrains Mono", monospace';
+        ctx.fillStyle = '#e2e8f0';
+        ctx.fillText(`${Math.ceil(hp)} HP | ${Math.ceil(shield)} SHD`, 128, 82);
       }
-
-      // Health Bar (100 HP - Green/Amber/Red)
-      const hpRatio = Math.max(0, Math.min(1, hp / maxHp));
-      ctx.fillStyle = 'rgba(15, 23, 42, 0.88)';
-      ctx.fillRect(barX - 2, 47, barW + 4, 16);
-      ctx.fillStyle = hpRatio > 0.5 ? '#22c55e' : (hpRatio > 0.25 ? '#f59e0b' : '#ef4444');
-      ctx.fillRect(barX, 49, barW * hpRatio, 12);
-
-      // Numeric HP + Shield Readout
-      ctx.font = 'bold 13px "JetBrains Mono", monospace';
-      ctx.fillStyle = '#e2e8f0';
-      ctx.fillText(`${Math.ceil(hp)} HP | ${Math.ceil(shield)} SHD`, 128, 77);
 
       tex.needsUpdate = true;
     }
@@ -1819,7 +1877,7 @@
     let botSerial = 1;
 
     // =========================================================================
-    // 7. COLLISION, SPAWNING & BOT-VS-BOT BATTLE ROYALE AI
+    // 7. COLLISION, SPAWNING & BOT-VS-BOT COMBAT
     // =========================================================================
     function checkCircleBoxCollision(x, z, radius, minY = 0, maxY = 1.8) {
       for (let i = 0; i < colliders.length; i++) {
@@ -1866,10 +1924,9 @@
       mesh.position.copy(pos);
 
       const botId = 'BOT-' + String(botSerial++).padStart(3, '0');
-      const baseHp = 100;
-      const baseShield = 50;
-
-      const statusSprite = createOverheadStatusSprite(botId, baseHp, baseHp, baseShield, baseShield, false);
+      const maxHp = 100;
+      const maxShield = 50;
+      const statusSprite = createOverheadStatusSprite(botId, maxHp, maxHp, maxShield, maxShield, false);
       mesh.add(statusSprite);
 
       scene.add(mesh);
@@ -1879,16 +1936,15 @@
         mesh,
         statusSprite,
         pos,
-        hp: baseHp,
-        maxHp: baseHp,
-        shield: baseShield,
-        maxShield: baseShield,
+        hp: maxHp,
+        maxHp,
+        shield: maxShield,
+        maxShield,
         speed: 4.2 + Math.random() * 1.4,
         fireCooldown: 0.6 + Math.random() * 1.1,
         strafeDir: Math.random() > 0.5 ? 1 : -1,
         strafeTimer: 1.5 + Math.random() * 2,
-        walkPhase: Math.random() * Math.PI * 2,
-        targetEnemy: null
+        walkPhase: Math.random() * Math.PI * 2
       });
     }
 
@@ -1929,42 +1985,39 @@
 
     function triggerHitmarker(isKill = false, isShield = false) {
       const hm = document.getElementById('hitmarker');
-      hm.classList.remove('active', 'kill');
+      hm.classList.remove('active', 'kill', 'shield');
       void hm.offsetWidth;
       hm.classList.add('active');
       if (isKill) hm.classList.add('kill');
-      hm.style.filter = isShield && !isKill ? 'drop-shadow(0 0 6px #38bdf8)' : 'none';
-      audio.playHitmarker(isKill);
-      setTimeout(() => {
-        hm.classList.remove('active', 'kill');
-        hm.style.filter = 'none';
-      }, 130);
+      else if (isShield) hm.classList.add('shield');
+      audio.playHitmarker(isKill, isShield);
+      setTimeout(() => hm.classList.remove('active', 'kill', 'shield'), 130);
     }
 
-    function damageBot(enemyIdx, amount, attackerName = 'YOU', isHeadshot = false) {
-      const e = enemies[enemyIdx];
-      if (!e) return;
+    function applyDamageToEnemy(idx, damage, attackerName = 'YOU', isHeadshot = false) {
+      const enemy = enemies[idx];
+      if (!enemy) return;
 
-      let remaining = amount;
+      let remainingDmg = damage;
       let hitShield = false;
 
-      if (e.shield > 0) {
+      if (enemy.shield > 0) {
         hitShield = true;
-        const absorbed = Math.min(e.shield, remaining);
-        e.shield -= absorbed;
-        remaining -= absorbed;
+        const absorbed = Math.min(enemy.shield, remainingDmg);
+        enemy.shield -= absorbed;
+        remainingDmg -= absorbed;
       }
 
-      if (remaining > 0) {
-        e.hp = Math.max(0, e.hp - remaining);
+      if (remainingDmg > 0) {
+        enemy.hp = Math.max(0, enemy.hp - remainingDmg);
       }
 
-      updateOverheadStatusSprite(e.statusSprite, e.hp, e.maxHp, e.shield, e.maxShield);
+      updateOverheadStatusSprite(enemy.statusSprite, enemy.hp, enemy.maxHp, enemy.shield, enemy.maxShield);
 
-      if (e.hp <= 0) {
-        eliminateEnemy(enemyIdx, attackerName, isHeadshot);
+      if (enemy.hp <= 0) {
+        eliminateEnemy(idx, attackerName, isHeadshot);
       } else if (attackerName === 'YOU') {
-        triggerHitmarker(false, hitShield);
+        triggerHitmarker(false, hitShield && enemy.shield > 0);
       }
     }
 
@@ -1974,14 +2027,18 @@
       scene.remove(enemy.mesh);
       enemies.splice(idx, 1);
 
-      const displayKiller = killerName === 'YOU' ? getPlayerCallsign() : killerName;
+      const callsign = getPlayerCallsign();
+      const isPlayerKill = killerName === callsign;
 
-      if (killerName === 'YOU') {
+      if (isPlayerKill) {
         gameState.kills++;
         gameState.streak++;
         gameState.score += isHeadshot ? 250 : 150;
+        const ptsEarned = isHeadshot ? 15 : 10;
+        gameState.matchPoints = Math.min(gameState.targetPoints, gameState.matchPoints + ptsEarned);
+
         triggerHitmarker(true, false);
-        addKillfeedEntry(`${displayKiller} ELIMINATED ${enemy.id}${isHeadshot ? ' [HEADSHOT]' : ''}`, isHeadshot);
+        addKillfeedEntry(`${callsign} ELIMINATED ${enemy.id}${isHeadshot ? ' [HEADSHOT]' : ''}`, isHeadshot);
 
         if (gameState.streak >= 3 && !gameState.uavActive) {
           gameState.uavActive = true;
@@ -1993,8 +2050,20 @@
           document.getElementById('chip-overdrive').classList.add('unlocked');
           showBanner('5-KILLSTREAK: OVERDRIVE', '+35% WEAPON DAMAGE & FIRE RATE');
         }
+
+        if (gameState.mode === 'TDM100' && gameState.matchPoints >= gameState.targetPoints) {
+          endMatch(true);
+          return;
+        }
       } else {
-        addKillfeedEntry(`${displayKiller} ELIMINATED ${enemy.id}`, false);
+        addKillfeedEntry(`${killerName} ELIMINATED ${enemy.id}`, false);
+        if (gameState.mode === 'TDM100') {
+          gameState.botLeaderPoints = Math.min(gameState.targetPoints, gameState.botLeaderPoints + 10);
+          if (gameState.botLeaderPoints >= gameState.targetPoints) {
+            endMatch(false);
+            return;
+          }
+        }
       }
 
       if (gameState.mode === 'BR') {
@@ -2005,6 +2074,10 @@
         }
         const desiredActive = Math.min(12, gameState.brAlive - 1);
         while (enemies.length < desiredActive) {
+          spawnEnemy();
+        }
+      } else if (gameState.mode === 'TDM100') {
+        while (enemies.length < 8) {
           spawnEnemy();
         }
       } else if (enemies.length === 0) {
@@ -2080,11 +2153,8 @@
       audio.playGunshot(player.weaponIdx === 0);
       player.muzzleTimer = 0.045;
       muzzleFlashMesh.material.opacity = 0.95;
-
-      // Viewmodel kickback
       viewmodelRoot.position.z += 0.032;
 
-      // Aimbot lock-on with zero upward recoil climb
       if (cheats.aimbot) {
         const target = findBestAimbotTarget();
         if (target) snapCameraToPoint(target);
@@ -2094,7 +2164,6 @@
         player.recoilKickYaw += (Math.random() - 0.5) * w.recoilYaw * op.recoilMult;
       }
 
-      // Cast ray from camera
       camera.updateMatrixWorld(true);
       const origin = camera.position.clone();
       const spread = cheats.aimbot ? 0 : (player.isAds ? w.spreadAds : w.spreadHip);
@@ -2105,12 +2174,9 @@
       ).normalize().applyQuaternion(camera.quaternion);
 
       const ray = new THREE.Raycaster(origin, dir, 0.1, 160);
-
-      // Check world walls first
       const wallHits = ray.intersectObjects(colliders.map(c => c.mesh), false);
       let maxHitDist = wallHits.length > 0 ? wallHits[0].distance : 150;
 
-      // Check enemy hitboxes
       let hitEnemyIdx = -1;
       let isHeadshot = false;
 
@@ -2133,7 +2199,7 @@
       if (hitEnemyIdx !== -1) {
         const dmgMult = (isHeadshot ? w.headshotMult : 1.0) * (gameState.overdriveActive ? 1.35 : 1.0);
         const dmg = Math.round(w.damage * dmgMult);
-        damageBot(hitEnemyIdx, dmg, 'YOU', isHeadshot);
+        applyDamageToEnemy(hitEnemyIdx, dmg, getPlayerCallsign(), isHeadshot);
       }
     }
 
@@ -2177,7 +2243,19 @@
       setTimeout(() => { vig.style.opacity = '0'; }, 180);
 
       if (player.hp <= 0) {
-        endMatch(false);
+        if (gameState.mode === 'TDM100') {
+          // Respawn immediately in 100-Point Deathmatch
+          player.hp = player.maxHp;
+          player.pos.set(0, 1.72, 16);
+          gameState.streak = 0;
+          gameState.botLeaderPoints = Math.min(gameState.targetPoints, gameState.botLeaderPoints + 10);
+          showBanner('RESPAWNED', `FIRST TO ${gameState.targetPoints} POINTS WINS`);
+          if (gameState.botLeaderPoints >= gameState.targetPoints) {
+            endMatch(false);
+          }
+        } else {
+          endMatch(false);
+        }
       }
     }
 
@@ -2203,6 +2281,8 @@
       gameState.gameOver = false;
       gameState.wave = 1;
       gameState.score = 0;
+      gameState.matchPoints = 0;
+      gameState.botLeaderPoints = 0;
       gameState.kills = 0;
       gameState.streak = 0;
       gameState.uavActive = false;
@@ -2215,6 +2295,7 @@
       gameState.brBotFightTimer = 1.8;
 
       zoneRingMesh.scale.set(1, 1, 1);
+      zoneRingMesh.visible = gameState.mode === 'BR';
       document.getElementById('chip-uav').classList.remove('unlocked');
       document.getElementById('chip-overdrive').classList.remove('unlocked');
 
@@ -2243,11 +2324,19 @@
       if (gameState.mode === 'BR') {
         document.getElementById('stat-primary-label').innerHTML = 'ZONE <span id="hud-wave">P1 (18S)</span>';
         document.getElementById('stat-secondary-label').innerHTML = 'ALIVE <span id="hud-enemies">100/100</span>';
+        document.getElementById('stat-score-label').innerHTML = 'SCORE <span id="hud-score">0</span>';
         for (let i = 0; i < 12; i++) spawnEnemy();
         showBanner('BATTLE ROYALE // 100 COMBATANTS', 'ELIMINATE ALL SQUADS & SURVIVE THE GAS');
+      } else if (gameState.mode === 'TDM100') {
+        document.getElementById('stat-primary-label').innerHTML = 'GOAL <span id="hud-wave">100 PTS</span>';
+        document.getElementById('stat-secondary-label').innerHTML = 'RIVAL <span id="hud-enemies">0/100</span>';
+        document.getElementById('stat-score-label').innerHTML = 'YOUR PTS <span id="hud-score">0/100</span>';
+        for (let i = 0; i < 8; i++) spawnEnemy();
+        showBanner('PRIVATE 100-POINT MATCH', 'FIRST TO 100 POINTS (+10 KILL / +15 HEADSHOT) WINS');
       } else {
         document.getElementById('stat-primary-label').innerHTML = 'WAVE <span id="hud-wave">1</span>';
         document.getElementById('stat-secondary-label').innerHTML = 'HOSTILES <span id="hud-enemies">6</span>';
+        document.getElementById('stat-score-label').innerHTML = 'SCORE <span id="hud-score">0</span>';
         for (let i = 0; i < 6; i++) spawnEnemy();
         showBanner('WAVE 1 // DEPLOYED', 'DEFEND THE CITY SECTOR');
       }
@@ -2265,18 +2354,32 @@
       player.isFiring = false;
       exitPointerLockSafe();
 
-      document.getElementById('end-kicker').textContent = isVictory ? 'MISSION ACCOMPLISHED' : 'KIA // AFTER-ACTION REPORT';
-      document.getElementById('end-title').textContent = isVictory
-        ? (gameState.mode === 'BR' ? 'VICTORY ROYALE (#1 / 100)' : `SURVIVED WAVE ${gameState.wave}`)
-        : (gameState.mode === 'BR' ? `ELIMINATED (#${gameState.brAlive} / 100)` : `FALLEN ON WAVE ${gameState.wave}`);
+      document.getElementById('end-kicker').textContent = isVictory
+        ? `MISSION ACCOMPLISHED // ${getPlayerCallsign()}`
+        : `AFTER-ACTION REPORT // ${getPlayerCallsign()}`;
+
+      if (gameState.mode === 'TDM100') {
+        document.getElementById('end-title').textContent = isVictory
+          ? `VICTORY — ${gameState.matchPoints} / 100 PTS`
+          : `DEFEAT — RIVAL REACHED 100 PTS`;
+        document.getElementById('final-placement').textContent = `${gameState.matchPoints}/100`;
+        document.getElementById('final-placement-lbl').textContent = 'POINTS';
+      } else if (gameState.mode === 'BR') {
+        document.getElementById('end-title').textContent = isVictory
+          ? 'VICTORY ROYALE (#1 / 100)'
+          : `ELIMINATED (#${gameState.brAlive} / 100)`;
+        document.getElementById('final-placement').textContent = `#${isVictory ? 1 : gameState.brAlive}`;
+        document.getElementById('final-placement-lbl').textContent = 'PLACEMENT';
+      } else {
+        document.getElementById('end-title').textContent = isVictory
+          ? `SURVIVED WAVE ${gameState.wave}`
+          : `FALLEN ON WAVE ${gameState.wave}`;
+        document.getElementById('final-placement').textContent = `W${gameState.wave}`;
+        document.getElementById('final-placement-lbl').textContent = 'WAVE';
+      }
 
       document.getElementById('final-kills').textContent = gameState.kills;
-      document.getElementById('final-placement').textContent = gameState.mode === 'BR'
-        ? `#${isVictory ? 1 : gameState.brAlive}`
-        : `W${gameState.wave}`;
-      document.getElementById('final-placement-lbl').textContent = gameState.mode === 'BR' ? 'PLACEMENT' : 'WAVE';
       document.getElementById('final-score').textContent = gameState.score;
-
       document.getElementById('gameover-overlay').classList.remove('hidden');
     }
 
@@ -2306,8 +2409,19 @@
     }
 
     // =========================================================================
-    // 10. ADMIN PANEL, LOBBY & INPUT EVENT LISTENERS
+    // 10. ADMIN PANEL, CALLSIGN, LOBBY & INPUT EVENT LISTENERS
     // =========================================================================
+    const playerNameInput = document.getElementById('player-name-input');
+    playerNameInput.value = gameState.playerName;
+    document.getElementById('callsign-preview').textContent = `ID: ${getPlayerCallsign()}`;
+
+    playerNameInput.addEventListener('input', () => {
+      gameState.playerName = playerNameInput.value.toUpperCase().slice(0, 16);
+      const clean = getPlayerCallsign();
+      document.getElementById('callsign-preview').textContent = `ID: ${clean}`;
+      try { localStorage.setItem('tfv_callsign', clean); } catch (e) {}
+    });
+
     function toggleAdminPanel() {
       const panel = document.getElementById('admin-panel');
       const isHidden = panel.classList.contains('hidden');
@@ -2374,28 +2488,21 @@
     document.getElementById('lobby-admin-btn').addEventListener('click', toggleAdminPanel);
     document.getElementById('close-admin-btn').addEventListener('click', toggleAdminPanel);
 
-    // Callsign input setup
-    const playerNameInput = document.getElementById('player-name-input');
-    const callsignPreviewBadge = document.getElementById('callsign-preview-badge');
-    playerNameInput.value = gameState.playerName;
-    callsignPreviewBadge.textContent = `ID: ${getPlayerCallsign()}`;
-
-    playerNameInput.addEventListener('input', () => {
-      const cleaned = playerNameInput.value.toUpperCase().replace(/[^A-Z0-9_\- ]/g, '').slice(0, 16);
-      gameState.playerName = cleaned || 'VANGUARD-1';
-      localStorage.setItem('tfv_callsign', gameState.playerName);
-      callsignPreviewBadge.textContent = `ID: ${getPlayerCallsign()}`;
-    });
-
-    // Mode & Operator selection
-    document.querySelectorAll('.mode-card').forEach(card => {
-      card.addEventListener('click', () => {
-        document.querySelectorAll('.mode-card').forEach(c => c.classList.remove('selected'));
-        card.classList.add('selected');
-        gameState.mode = card.dataset.mode;
-        document.getElementById('selected-mode-label').textContent =
-          gameState.mode === 'BR' ? 'MODE: 100-PLAYER BATTLE ROYALE' : 'MODE: WAVE SURVIVAL';
+    function selectModeCard(modeKey) {
+      document.querySelectorAll('.mode-card').forEach(c => {
+        c.classList.toggle('selected', c.dataset.mode === modeKey);
       });
+      gameState.mode = modeKey;
+      const labels = {
+        BR: 'MODE: 100-PLAYER BATTLE ROYALE',
+        TDM100: 'MODE: 100-POINT DEATHMATCH',
+        SURVIVAL: 'MODE: WAVE SURVIVAL'
+      };
+      document.getElementById('selected-mode-label').textContent = labels[modeKey] || 'MODE: BATTLE ROYALE';
+    }
+
+    document.querySelectorAll('.mode-card').forEach(card => {
+      card.addEventListener('click', () => selectModeCard(card.dataset.mode));
     });
 
     document.querySelectorAll('.operator-card').forEach(card => {
@@ -2407,7 +2514,7 @@
       });
     });
 
-    // Private Match Room Buttons
+    // Private Match Room & 100-Point Quick Launch
     document.getElementById('create-room-btn').addEventListener('click', () => {
       const code = generateRoomCode();
       connectRoomChannel(code, true);
@@ -2430,7 +2537,15 @@
       }
     });
 
-    // Deploy, Pause, Resume, Restart & Lobby Buttons
+    document.getElementById('start-private-100-btn').addEventListener('click', () => {
+      if (!netState.roomCode) {
+        const code = generateRoomCode();
+        connectRoomChannel(code, true);
+      }
+      selectModeCard('TDM100');
+      startMatch();
+    });
+
     document.getElementById('deploy-btn').addEventListener('click', startMatch);
     document.getElementById('restart-btn').addEventListener('click', startMatch);
     document.getElementById('pause-lobby-btn').addEventListener('click', returnToLobby);
@@ -2540,7 +2655,6 @@
         const boxH = Math.max(18, syBottom - syTop);
         const boxW = boxH * 0.52;
 
-        // Snapline
         espCtx.strokeStyle = 'rgba(239, 68, 68, 0.55)';
         espCtx.lineWidth = 1.2;
         espCtx.beginPath();
@@ -2548,25 +2662,15 @@
         espCtx.lineTo(sx, syBottom);
         espCtx.stroke();
 
-        // Bounding Box
         espCtx.strokeStyle = '#ef4444';
         espCtx.lineWidth = 2;
         espCtx.strokeRect(sx - boxW / 2, syTop, boxW, boxH);
 
-        // Health + Shield Bar & Distance Tag
         const dist = Math.round(player.pos.distanceTo(e.pos));
-        const hpRatio = Math.max(0, e.hp / e.maxHp);
-        const shRatio = Math.max(0, e.shield / e.maxShield);
-
-        espCtx.fillStyle = '#22c55e';
-        espCtx.fillRect(sx - boxW / 2 - 6, syTop + boxH * (1 - hpRatio), 3, boxH * hpRatio);
-        espCtx.fillStyle = '#38bdf8';
-        espCtx.fillRect(sx - boxW / 2 - 11, syTop + boxH * (1 - shRatio), 3, boxH * shRatio);
-
         espCtx.font = 'bold 11px "JetBrains Mono", monospace';
         espCtx.fillStyle = '#fca5a5';
         espCtx.textAlign = 'center';
-        espCtx.fillText(`${e.id} [${dist}M]`, sx, syTop - 5);
+        espCtx.fillText(`${e.id} [${Math.ceil(e.hp)}HP+${Math.ceil(e.shield)}SHD] ${dist}M`, sx, syTop - 6);
       }
     }
 
@@ -2575,7 +2679,6 @@
       const half = size / 2;
       radarCtx.clearRect(0, 0, size, size);
 
-      // Grid rings
       radarCtx.strokeStyle = 'rgba(56, 189, 248, 0.22)';
       radarCtx.lineWidth = 1;
       [24, 48, 72].forEach(r => {
@@ -2586,7 +2689,6 @@
 
       const scale = 1.15;
 
-      // Safe Zone Ring on Radar in BR mode
       if (gameState.mode === 'BR') {
         const zr = gameState.brZoneRadius * scale;
         radarCtx.strokeStyle = 'rgba(34, 197, 94, 0.65)';
@@ -2596,7 +2698,6 @@
         radarCtx.stroke();
       }
 
-      // Enemy Blips
       enemies.forEach(e => {
         const dx = e.pos.x - player.pos.x;
         const dz = e.pos.z - player.pos.z;
@@ -2612,7 +2713,6 @@
         radarCtx.fill();
       });
 
-      // Player Directional Arrow
       radarCtx.save();
       radarCtx.translate(half, half);
       radarCtx.rotate(-player.yaw);
@@ -2656,17 +2756,23 @@
         (!cheats.infammo && ammoObj.mag <= 5 && !player.isReloading) ? 'block' : 'none';
 
       document.getElementById('hud-streak').textContent = gameState.streak;
-      document.getElementById('hud-score').textContent = gameState.score;
 
       const waveEl = document.getElementById('hud-wave');
       const enemiesEl = document.getElementById('hud-enemies');
-      if (waveEl && enemiesEl) {
+      const scoreEl = document.getElementById('hud-score');
+      if (waveEl && enemiesEl && scoreEl) {
         if (gameState.mode === 'BR') {
           waveEl.textContent = `P${gameState.brPhase} (${Math.ceil(gameState.brTimer)}S)`;
           enemiesEl.textContent = `${gameState.brAlive}/100`;
+          scoreEl.textContent = gameState.score;
+        } else if (gameState.mode === 'TDM100') {
+          waveEl.textContent = `${gameState.targetPoints} PTS`;
+          enemiesEl.textContent = `${gameState.botLeaderPoints}/100`;
+          scoreEl.textContent = `${gameState.matchPoints}/100`;
         } else {
           waveEl.textContent = gameState.wave;
           enemiesEl.textContent = enemies.length;
+          scoreEl.textContent = gameState.score;
         }
       }
     }
@@ -2692,13 +2798,11 @@
       if (gameState.active && !gameState.paused && !gameState.gameOver) {
         const op = OPERATORS[gameState.operator] || OPERATORS.GHOST;
 
-        // Continuous Aimbot Tracking when holding ADS or Fire
         if (cheats.aimbot && (player.isAds || player.isFiring)) {
           const target = findBestAimbotTarget();
           if (target) snapCameraToPoint(target);
         }
 
-        // Recoil Recovery
         player.recoilKickPitch = THREE.MathUtils.lerp(player.recoilKickPitch, 0, dt * 12);
         player.recoilKickYaw = THREE.MathUtils.lerp(player.recoilKickYaw, 0, dt * 12);
 
@@ -2706,7 +2810,6 @@
         const totalYaw = player.yaw + player.recoilKickYaw;
         camera.quaternion.setFromEuler(new THREE.Euler(totalPitch, totalYaw, 0, 'YXZ'));
 
-        // Player Movement (WASD + Sprint + Jump)
         const forward = new THREE.Vector3(-Math.sin(player.yaw), 0, -Math.cos(player.yaw));
         const right = new THREE.Vector3(Math.cos(player.yaw), 0, -Math.sin(player.yaw));
         const moveDir = new THREE.Vector3();
@@ -2742,7 +2845,6 @@
           player.onGround = true;
         }
 
-        // Camera Head Bob & ADS FOV
         if (isMoving && player.onGround) {
           player.bobTimer += dt * (isSprinting ? 14 : 9.5);
         } else {
@@ -2757,7 +2859,6 @@
         camera.fov = THREE.MathUtils.lerp(camera.fov, targetFov, dt * 10 * op.adsMult);
         camera.updateProjectionMatrix();
 
-        // First-Person Weapon Viewmodel Positioning & Sway
         const targetPos = player.isAds ? w.adsPos : w.hipPos;
         const swayX = Math.cos(player.bobTimer * 0.5) * (player.isAds ? 0.002 : 0.012);
         const swayY = Math.abs(Math.sin(player.bobTimer * 0.5)) * (player.isAds ? 0.002 : 0.012);
@@ -2769,7 +2870,6 @@
 
         document.getElementById('crosshair-container').style.opacity = player.isAds ? '0.18' : '1';
 
-        // Weapon Cooldowns, Auto-Fire & Reload
         if (player.fireCooldown > 0) player.fireCooldown -= dt;
         if (player.isFiring && w.auto) fireWeapon();
 
@@ -2783,12 +2883,11 @@
           if (player.muzzleTimer <= 0) muzzleFlashMesh.material.opacity = 0;
         }
 
-        // Health Auto-Regeneration
         if (player.hp < player.maxHp && now - player.lastDamageTime > 3400) {
           player.hp = Math.min(player.maxHp, player.hp + 12 * op.regenMult * dt);
         }
 
-        // Battle Royale Gas Zone & Bot-vs-Bot Simulated Distant Fights
+        // Battle Royale Gas Zone & Simulated Distant Fights
         if (gameState.mode === 'BR') {
           gameState.brTimer -= dt;
           if (gameState.brTimer <= 0) {
@@ -2822,7 +2921,7 @@
           document.getElementById('gas-vignette').style.opacity = '0';
         }
 
-        // Update Active 3D AI Soldiers (Engage Player & Battle Each Other in BR)
+        // Update Active 3D AI Soldiers
         for (let i = enemies.length - 1; i >= 0; i--) {
           const e = enemies[i];
           const toPlayer = new THREE.Vector3().subVectors(player.pos, e.pos);
@@ -2832,7 +2931,7 @@
           let targetEnemyIdx = -1;
           let bestDist = distToPlayer;
 
-          if (gameState.mode === 'BR') {
+          if (gameState.mode === 'BR' || gameState.mode === 'TDM100') {
             for (let j = 0; j < enemies.length; j++) {
               if (i === j) continue;
               const d = e.pos.distanceTo(enemies[j].pos);
@@ -2875,7 +2974,6 @@
           e.mesh.userData.leftLeg.rotation.x = Math.sin(e.walkPhase) * 0.5;
           e.mesh.userData.rightLeg.rotation.x = -Math.sin(e.walkPhase) * 0.5;
 
-          // Bot Firing
           e.fireCooldown -= dt;
           if (e.fireCooldown <= 0 && dist < 52) {
             e.fireCooldown = 1.1 + Math.random() * 1.1;
@@ -2885,9 +2983,8 @@
             if (hasLineOfSight(muzzle, aimPoint)) {
               spawnTracer(muzzle, aimPoint, 0xef4444);
               if (targetEnemyIdx !== -1 && enemies[targetEnemyIdx]) {
-                const countBefore = enemies.length;
-                damageBot(targetEnemyIdx, 26, e.id, false);
-                if (enemies.length < countBefore && targetEnemyIdx < i) i--;
+                applyDamageToEnemy(targetEnemyIdx, 28, e.id, false);
+                if (targetEnemyIdx < i && !enemies[targetEnemyIdx]) i--;
               } else if (Math.random() < 0.34) {
                 applyDamageToPlayer(11);
               }
@@ -2895,14 +2992,13 @@
           }
         }
 
-        // Broadcast squad position if connected
         if (netState.channel && now - netState.lastSync > 80) {
           netState.lastSync = now;
           broadcastNet({
             type: 'STATE',
             id: netState.playerId,
-            name: getPlayerCallsign(),
             op: gameState.operator,
+            name: getPlayerCallsign(),
             x: player.pos.x,
             y: player.pos.y - 1.72,
             z: player.pos.z,
@@ -2911,7 +3007,6 @@
         }
       }
 
-      // Fade bullet tracers
       for (let i = tracers.length - 1; i >= 0; i--) {
         tracers[i].life -= dt;
         tracers[i].line.material.opacity = Math.max(0, tracers[i].life / 0.09);
@@ -2928,23 +3023,22 @@
     }
 
     function updateRemotePeer(msg) {
-      const peerName = (msg.name || msg.op || 'SQUADMATE').toUpperCase();
       let peer = netState.peers.get(msg.id);
+      const label = (msg.name || msg.op || 'SQUADMATE').toUpperCase().slice(0, 16);
       if (!peer) {
         const mesh = buildCharacterMesh(msg.op || 'GHOST', false);
-        const badge = createOverheadStatusSprite(peerName, 100, 100, 50, 50, true);
-        mesh.add(badge);
+        const sprite = createOverheadStatusSprite(label, 100, 100, 50, 50, true);
+        mesh.add(sprite);
         scene.add(mesh);
-        peer = { mesh, badge };
+        peer = { mesh, sprite };
         netState.peers.set(msg.id, peer);
-      } else if (peer.badge) {
-        updateOverheadStatusSprite(peer.badge, 100, 100, 50, 50, peerName);
+      } else if (peer.sprite && peer.sprite.userData.label !== label) {
+        updateOverheadStatusSprite(peer.sprite, 100, 100, 50, 50, label);
       }
       peer.mesh.position.set(msg.x || 0, msg.y || 0, msg.z || 0);
       peer.mesh.rotation.y = (msg.yaw || 0) + Math.PI;
     }
 
-    // Initialize default weapon viewmodel & kick off render loop
     viewmodelRoot.position.copy(WEAPONS[0].hipPos);
     requestAnimationFrame(animate);
   </script>
