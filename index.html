@@ -748,10 +748,11 @@
     }
 
     #mp-roster {
-      font-size: 0.72rem;
-      color: #cbd5e1;
+      font-size: 0.74rem;
+      color: #4ade80;
       margin-top: 4px;
       font-family: 'JetBrains Mono', monospace;
+      font-weight: 700;
     }
 
     /* Admin Panel Modal */
@@ -1025,13 +1026,13 @@
         <div class="mp-row">
           <button class="btn-secondary" id="create-room-btn">CREATE ROOM</button>
           <div class="mp-code-display" id="room-code-box">-----</div>
-          <button class="btn-secondary" id="copy-code-btn">COPY</button>
+          <button class="btn-secondary" id="copy-code-btn">COPY LINK</button>
           <input type="text" id="join-code-input" class="tactical-input" maxlength="5" placeholder="CODE" />
           <button class="btn-secondary" id="join-room-btn">JOIN</button>
           <button class="btn-amber" id="start-private-100-btn">START PRIVATE MATCH (100 PTS · NO BOTS)</button>
         </div>
-        <div id="mp-status">Status: Ready — Create a Room or enter a friend's 5-letter code to play PvP with 0 bots.</div>
-        <div id="mp-roster">Squad Lobby: Solo</div>
+        <div id="mp-status">Status: Ready — Create a Room and share the invite link or 5-letter code with your friend.</div>
+        <div id="mp-roster">Squad Lobby: Solo (1 Player)</div>
       </div>
 
       <button class="btn-primary" id="deploy-btn">DEPLOY INTO COMBAT</button>
@@ -1180,7 +1181,7 @@
     const audio = new TacticalAudio();
 
     // =========================================================================
-    // 2. GAME CONFIGURATION, OPERATORS, CALLSIGN & CROSS-DEVICE PEERJS + LOCAL SYNC
+    // 2. GAME CONFIGURATION, OPERATORS, CALLSIGN & RELIABLE CROSS-DEVICE SYNC
     // =========================================================================
     const OPERATORS = {
       GHOST: {
@@ -1283,10 +1284,10 @@
       channel: null,
       peer: null,
       connections: new Map(),
-      playerId: 'P-' + Math.random().toString(36).substring(2, 6).toUpperCase(),
+      playerId: 'P-' + Math.random().toString(36).substring(2, 7).toUpperCase(),
       peers: new Map(),
       lastSync: 0,
-      matchLaunchTimer: null
+      heartbeatTimer: null
     };
 
     function generateRoomCode() {
@@ -1304,12 +1305,16 @@
       const rosterEl = document.getElementById('mp-roster');
       if (rosterEl) {
         rosterEl.textContent = netState.roomCode
-          ? `Room ${netState.roomCode} Players (${names.length}): ${names.join('  |  ')}`
-          : 'Squad Lobby: Solo';
+          ? `Room ${netState.roomCode} Connected (${names.length}): ${names.join('  |  ')}`
+          : 'Squad Lobby: Solo (1 Player)';
       }
     }
 
     function cleanupNetwork() {
+      if (netState.heartbeatTimer) {
+        clearInterval(netState.heartbeatTimer);
+        netState.heartbeatTimer = null;
+      }
       if (netState.channel) {
         try { netState.channel.close(); } catch (e) {}
         netState.channel = null;
@@ -1328,7 +1333,7 @@
       netState.peers.clear();
     }
 
-    function bindPeerConnection(conn) {
+    function bindPeerConnection(conn, code, asHost) {
       conn.on('open', () => {
         netState.connections.set(conn.peer, conn);
         const helloMsg = {
@@ -1338,7 +1343,7 @@
           name: getPlayerCallsign(),
           active: gameState.active,
           mode: gameState.mode,
-          isPrivate: gameState.isPrivateMatch
+          isPrivate: true
         };
         try { conn.send(helloMsg); } catch (e) {}
       });
@@ -1350,6 +1355,13 @@
       conn.on('close', () => {
         netState.connections.delete(conn.peer);
         updateLobbyRosterUI();
+      });
+
+      conn.on('error', () => {
+        if (!asHost) {
+          document.getElementById('mp-status').textContent =
+            `Status: Retrying connection to Host ${code}...`;
+        }
       });
     }
 
@@ -1363,6 +1375,13 @@
       document.getElementById('hud-room-badge').textContent = `PRIVATE: ${code}`;
       updateLobbyRosterUI();
 
+      // Update browser URL so copying link shares the room code
+      try {
+        const url = new URL(window.location.href);
+        url.searchParams.set('room', code);
+        window.history.replaceState({}, '', url.toString());
+      } catch (e) {}
+
       // 1. Same-browser / Sandbox BroadcastChannel
       try {
         if (typeof BroadcastChannel !== 'undefined') {
@@ -1371,40 +1390,80 @@
         }
       } catch (e) {}
 
-      // 2. Cross-Device WebRTC PeerJS (Works over GitHub Pages across phones/PCs)
+      // 2. Cross-Device WebRTC PeerJS with STUN servers for Mobile/PC NAT traversal
       try {
         if (typeof Peer !== 'undefined') {
           const peerId = asHost
-            ? `tfv-host-${code}`
-            : `tfv-client-${code}-${netState.playerId}`;
-          const peer = new Peer(peerId, { debug: 0 });
+            ? `tfv-room-host-${code}`
+            : `tfv-room-guest-${code}-${netState.playerId}`;
+
+          const peer = new Peer(peerId, {
+            debug: 0,
+            config: {
+              iceServers: [
+                { urls: 'stun:stun.l.google.com:19302' },
+                { urls: 'stun:stun1.l.google.com:19302' },
+                { urls: 'stun:stun2.l.google.com:19302' }
+              ]
+            }
+          });
           netState.peer = peer;
+
+          const connectToHost = () => {
+            if (!netState.peer || netState.peer.destroyed) return;
+            const hostId = `tfv-room-host-${code}`;
+            const existing = netState.connections.get(hostId);
+            if (existing && existing.open) return;
+
+            const conn = peer.connect(hostId, { reliable: true });
+            bindPeerConnection(conn, code, false);
+          };
 
           peer.on('open', () => {
             if (asHost) {
               document.getElementById('mp-status').textContent =
-                `Status: Room ${code} LIVE! Share code with friends — zero bots will spawn.`;
+                `Status: Room ${code} ONLINE! Click COPY LINK and send to your friend.`;
             } else {
               document.getElementById('mp-status').textContent =
-                `Status: Connecting to Host ${code}...`;
-              const conn = peer.connect(`tfv-host-${code}`, { reliable: true });
-              bindPeerConnection(conn);
+                `Status: Linking to Host ${code}...`;
+              connectToHost();
             }
           });
 
           peer.on('connection', (incomingConn) => {
-            bindPeerConnection(incomingConn);
+            bindPeerConnection(incomingConn, code, asHost);
           });
 
-          peer.on('error', () => {
-            document.getElementById('mp-status').textContent = asHost
-              ? `Status: Room ${code} Active (Local Tab Sync Ready).`
-              : `Status: Joined Room ${code} (Local Tab Sync Ready).`;
+          peer.on('error', (err) => {
+            if (err && err.type === 'unavailable-id' && asHost) {
+              // If host ID is taken, automatically join that room as a guest!
+              document.getElementById('mp-status').textContent =
+                `Status: Room ${code} already exists — joining friend's room...`;
+              setTimeout(() => connectRoomChannel(code, false), 200);
+            } else if (!asHost) {
+              document.getElementById('mp-status').textContent =
+                `Status: Searching for Host ${code}... (Make sure Host clicked CREATE ROOM first)`;
+            }
           });
+
+          // Heartbeat: keep trying to connect & sync lobby roster every 2s
+          netState.heartbeatTimer = setInterval(() => {
+            if (!asHost && netState.connections.size === 0) {
+              connectToHost();
+            }
+            broadcastNet({
+              type: 'HELLO',
+              id: netState.playerId,
+              op: gameState.operator,
+              name: getPlayerCallsign(),
+              active: gameState.active,
+              mode: gameState.mode,
+              isPrivate: true
+            });
+          }, 2000);
         }
       } catch (err) {}
 
-      // Announce on BroadcastChannel immediately
       broadcastNet({
         type: 'HELLO',
         id: netState.playerId,
@@ -1415,13 +1474,9 @@
         isPrivate: true
       });
 
-      if (asHost) {
-        document.getElementById('mp-status').textContent =
-          `Status: Private Room ${code} Created! Waiting for friends to join (No Bots).`;
-      } else {
-        document.getElementById('mp-status').textContent =
-          `Status: Joined Room ${code}! Ready — match starts automatically when host launches.`;
-      }
+      document.getElementById('mp-status').textContent = asHost
+        ? `Status: Private Room ${code} Created! Share COPY LINK or code ${code} with your friend.`
+        : `Status: Connecting to Private Room ${code}...`;
     }
 
     function broadcastNet(payload) {
@@ -1439,7 +1494,6 @@
       if (!msg || msg.id === netState.playerId) return;
       const peerName = (msg.name || msg.op || 'FRIEND').toUpperCase().slice(0, 16);
 
-      // Host relays messages to all other connected friends so everyone sees everyone
       if (netState.isHost && sourceConn && msg.type !== 'WELCOME') {
         netState.connections.forEach((conn, peerKey) => {
           if (peerKey !== sourceConn.peer && conn.open) {
@@ -1449,10 +1503,14 @@
       }
 
       if (msg.type === 'HELLO' || msg.type === 'WELCOME') {
+        const isNewFriend = !netState.peers.has(msg.id);
         ensureRemotePeer(msg.id, peerName, msg.op || 'GHOST');
         updateLobbyRosterUI();
-        document.getElementById('mp-status').textContent =
-          `Status: ${peerName} (${msg.op}) is in Room ${netState.roomCode}! (0 Bots)`;
+
+        if (isNewFriend) {
+          document.getElementById('mp-status').textContent =
+            `Status: CONNECTED! ${peerName} (${msg.op}) joined Room ${netState.roomCode}! (0 Bots)`;
+        }
 
         if (msg.type === 'HELLO') {
           const reply = {
@@ -1462,7 +1520,7 @@
             name: getPlayerCallsign(),
             active: gameState.active,
             mode: gameState.mode,
-            isPrivate: gameState.isPrivateMatch
+            isPrivate: true
           };
           if (sourceConn && sourceConn.open) {
             try { sourceConn.send(reply); } catch (e) {}
@@ -1470,13 +1528,12 @@
             broadcastNet(reply);
           }
 
-          // If host is already inside a Private Match, pull the joining friend straight in!
           if (netState.isHost && gameState.active) {
             const launchPayload = {
               type: 'START_MATCH',
               id: netState.playerId,
               mode: gameState.mode,
-              isPrivate: gameState.isPrivateMatch
+              isPrivate: true
             };
             if (sourceConn && sourceConn.open) {
               try { sourceConn.send(launchPayload); } catch (e) {}
@@ -1485,16 +1542,15 @@
             }
           }
         } else if (msg.type === 'WELCOME' && msg.active && !gameState.active) {
-          // Host is already in a match; auto-join them!
           gameState.mode = msg.mode || 'TDM100';
-          gameState.isPrivateMatch = msg.isPrivate !== false;
+          gameState.isPrivateMatch = true;
           selectModeCard(gameState.mode);
           startMatch(true);
         }
       } else if (msg.type === 'START_MATCH') {
         if (!gameState.active) {
           gameState.mode = msg.mode || 'TDM100';
-          gameState.isPrivateMatch = msg.isPrivate !== false;
+          gameState.isPrivateMatch = true;
           selectModeCard(gameState.mode);
           startMatch(true);
         }
@@ -1513,12 +1569,12 @@
           gameState.score += msg.isHeadshot ? 250 : 150;
           gameState.matchPoints = Math.min(gameState.targetPoints, gameState.matchPoints + pts);
           triggerHitmarker(true, false);
-          if (gameState.mode === 'TDM100' && gameState.matchPoints >= gameState.targetPoints) {
+          if ((gameState.mode === 'TDM100' || gameState.isPrivateMatch) && gameState.matchPoints >= gameState.targetPoints) {
             endMatch(true);
           }
         } else {
           gameState.rivalPoints = Math.max(gameState.rivalPoints, msg.killerPoints || 0);
-          if (gameState.mode === 'TDM100' && gameState.rivalPoints >= gameState.targetPoints) {
+          if ((gameState.mode === 'TDM100' || gameState.isPrivateMatch) && gameState.rivalPoints >= gameState.targetPoints) {
             endMatch(false);
           }
         }
@@ -1680,7 +1736,6 @@
     const crateAmberMat = new THREE.MeshStandardMaterial({ map: containerAmberTex, roughness: 0.6 });
     const hazardMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.7 });
 
-    // Outer Perimeter City Walls
     addCityBox(0, 4, -WORLD_HALF, WORLD_HALF * 2, 8, 2, hazardMat);
     addCityBox(0, 4, WORLD_HALF, WORLD_HALF * 2, 8, 2, hazardMat);
     addCityBox(-WORLD_HALF, 4, 0, 2, 8, WORLD_HALF * 2, hazardMat);
@@ -2087,7 +2142,6 @@
     }
 
     function spawnEnemy() {
-      // Never spawn AI bots in a Private Match with friends
       if (gameState.isPrivateMatch) return;
 
       const pos = findSafeSpawnPoint(18);
@@ -2375,7 +2429,6 @@
       let hitPeerId = null;
       let isHeadshot = false;
 
-      // 1. Check AI Bot Hitboxes
       for (let i = 0; i < enemies.length; i++) {
         const e = enemies[i];
         const hitTargets = [e.mesh.userData.head, e.mesh.userData.torso];
@@ -2388,7 +2441,6 @@
         }
       }
 
-      // 2. Check Connected Friends (PvP Hitboxes)
       netState.peers.forEach((peer, peerId) => {
         if (!peer.mesh) return;
         const hitTargets = [peer.mesh.userData.head, peer.mesh.userData.torso];
@@ -2484,7 +2536,7 @@
           });
         }
 
-        if (gameState.mode === 'TDM100') {
+        if (gameState.mode === 'TDM100' || gameState.isPrivateMatch) {
           player.hp = player.maxHp;
           const spawn = findSafeSpawnPoint(10);
           player.pos.set(spawn.x, 1.72, spawn.z);
@@ -2519,7 +2571,6 @@
       const op = OPERATORS[gameState.operator] || OPERATORS.GHOST;
       applyOperatorStyle();
 
-      // If in a room, mark as Private Match (0 bots)
       if (netState.roomCode) {
         gameState.isPrivateMatch = true;
       }
@@ -2549,7 +2600,6 @@
       document.getElementById('chip-uav').classList.remove('unlocked');
       document.getElementById('chip-overdrive').classList.remove('unlocked');
 
-      // Offset spawn position so host & friends don't spawn inside each other
       const spawnOffset = netState.isHost ? -14 : 14;
       player.pos.set(spawnOffset, 1.72, 16);
       player.vel.set(0, 0, 0);
@@ -2574,7 +2624,6 @@
       document.getElementById('gameover-overlay').classList.add('hidden');
 
       if (gameState.isPrivateMatch) {
-        // ZERO BOTS IN PRIVATE MATCH
         document.getElementById('stat-primary-label').innerHTML = 'GOAL <span id="hud-wave">100 PTS</span>';
         document.getElementById('stat-secondary-label').innerHTML = 'RIVAL <span id="hud-enemies">0/100</span>';
         document.getElementById('stat-score-label').innerHTML = 'YOUR PTS <span id="hud-score">0/100</span>';
@@ -2599,7 +2648,6 @@
         showBanner('WAVE 1 // DEPLOYED', 'DEFEND THE CITY SECTOR');
       }
 
-      // Broadcast START_MATCH reliably so all connected friends launch simultaneously
       if (netState.roomCode && !fromRemoteSignal) {
         const launchMsg = {
           type: 'START_MATCH',
@@ -2789,9 +2837,18 @@
 
     document.getElementById('copy-code-btn').addEventListener('click', () => {
       const code = document.getElementById('room-code-box').textContent;
-      if (code && code !== '-----' && navigator.clipboard) {
-        navigator.clipboard.writeText(code).catch(() => {});
-        document.getElementById('mp-status').textContent = `Status: Copied room code ${code} to clipboard!`;
+      if (code && code !== '-----') {
+        let shareText = code;
+        try {
+          const url = new URL(window.location.href);
+          url.searchParams.set('room', code);
+          shareText = url.toString();
+        } catch (e) {}
+        if (navigator.clipboard) {
+          navigator.clipboard.writeText(shareText).catch(() => {});
+        }
+        document.getElementById('mp-status').textContent =
+          `Status: Copied Invite Link for Room ${code}! Send it to your friend to auto-join.`;
       }
     });
 
@@ -2837,6 +2894,16 @@
       document.getElementById('pause-overlay').classList.add('hidden');
       requestPointerLockSafe();
     });
+
+    // Auto-join room if opened via Invite Link (?room=XXXXX)
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const urlRoom = (params.get('room') || '').trim().toUpperCase();
+      if (urlRoom.length === 5) {
+        document.getElementById('join-code-input').value = urlRoom;
+        setTimeout(() => connectRoomChannel(urlRoom, false), 150);
+      }
+    } catch (e) {}
 
     // Keyboard & Mouse Controls
     window.addEventListener('keydown', (e) => {
@@ -3175,7 +3242,6 @@
           player.hp = Math.min(player.maxHp, player.hp + 12 * op.regenMult * dt);
         }
 
-        // Battle Royale Gas Zone (only simulated bots when NOT in a Private Match)
         if (gameState.mode === 'BR') {
           gameState.brTimer -= dt;
           if (gameState.brTimer <= 0) {
@@ -3211,7 +3277,6 @@
           document.getElementById('gas-vignette').style.opacity = '0';
         }
 
-        // Update Active 3D AI Soldiers (Only present in Solo/Public modes)
         for (let i = enemies.length - 1; i >= 0; i--) {
           const e = enemies[i];
           const toPlayer = new THREE.Vector3().subVectors(player.pos, e.pos);
@@ -3282,7 +3347,6 @@
           }
         }
 
-        // Sync player position & HP to connected friends
         if (netState.roomCode && now - netState.lastSync > 55) {
           netState.lastSync = now;
           broadcastNet({
