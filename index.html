@@ -603,7 +603,7 @@
       margin-top: 2px;
     }
 
-    /* Private Room Box */
+    /* Private Room & Callsign Box */
     .mp-panel {
       background: rgba(255, 255, 255, 0.03);
       border: 1px solid rgba(255, 255, 255, 0.12);
@@ -642,6 +642,11 @@
       border-radius: 6px;
       width: 125px;
       text-transform: uppercase;
+    }
+
+    .tactical-input:focus {
+      outline: none;
+      border-color: var(--cod-cyan);
     }
 
     .btn-secondary {
@@ -813,7 +818,7 @@
         <span id="compass-right">NE</span>
       </div>
       <div id="wave-stats">
-        <div class="stat-pill" id="stat-primary-label">ZONE <span id="hud-wave">P1 (16S)</span></div>
+        <div class="stat-pill" id="stat-primary-label">ZONE <span id="hud-wave">P1 (18S)</span></div>
         <div class="stat-pill" id="stat-secondary-label">ALIVE <span id="hud-enemies">100/100</span></div>
         <div class="stat-pill">STREAK <span id="hud-streak">0</span></div>
         <div class="stat-pill">SCORE <span id="hud-score">0</span></div>
@@ -843,7 +848,7 @@
     </div>
 
     <div id="health-panel">
-      <div id="hud-operator-label">GHOST // RECON</div>
+      <div id="hud-operator-label">VANGUARD-1 // GHOST</div>
       <div class="health-header">
         <div id="health-val">100</div>
         <div class="health-label">ARMOR + HP</div>
@@ -860,7 +865,7 @@
     <div id="weapon-panel">
       <div id="weapon-name">M4A1 TACTICAL</div>
       <div id="weapon-mode">[AUTO] 5.56 NATO · [1/2] SWITCH</div>
-      <div id="ammo-readout"><span id="ammo-mag">30</span> <span id="ammo-reserve">/ 120</span></div>
+      <div id="ammo-readout"><span id="ammo-mag">30</span> <span id="ammo-reserve">/ 150</span></div>
       <div id="reload-prompt">PRESS [R] TO RELOAD</div>
     </div>
   </div>
@@ -910,6 +915,17 @@
       <div class="game-kicker">MULTI-DISTRICT URBAN COMBAT // 3D FPS</div>
       <div class="game-title">TASK FORCE VANGUARD</div>
 
+      <div class="mp-panel" style="margin-bottom:14px; padding:10px 14px;">
+        <div class="section-header-row" style="margin-bottom:4px;">
+          <span>0. OPERATOR CALLSIGN (PLAYER NAME)</span>
+          <span id="callsign-preview-badge" style="color:var(--cod-cyan)">ID: VANGUARD-1</span>
+        </div>
+        <div class="mp-row" style="margin-top:4px;">
+          <input type="text" id="player-name-input" class="tactical-input" style="width:240px; text-transform:uppercase;" maxlength="16" placeholder="ENTER CALLSIGN..." value="VANGUARD-1" />
+          <span style="font-size:0.75rem; color:#94a3b8;">Shown in HUD, Killfeed &amp; Squad Matches</span>
+        </div>
+      </div>
+
       <div class="section-header-row">
         <span>1. SELECT COMBAT MODE</span>
         <span id="selected-mode-label" style="color:var(--cod-cyan)">MODE: 100-PLAYER BATTLE ROYALE</span>
@@ -917,11 +933,11 @@
       <div class="mode-selector-grid">
         <div class="mode-card selected" data-mode="BR">
           <div class="mode-card-title">BATTLE ROYALE (100 PLAYERS)</div>
-          <div class="mode-card-desc">100 combatants across 4 city districts. Bots battle each other, shrinking gas zone, last standing wins.</div>
+          <div class="mode-card-desc">100 combatants across 4 city districts. 100HP+50Shield bots battle each other, shrinking gas zone, last standing wins.</div>
         </div>
         <div class="mode-card" data-mode="SURVIVAL">
           <div class="mode-card-title">WAVE SURVIVAL</div>
-          <div class="mode-card-desc">Solo or squad defense against escalating waves of hostile tactical squads.</div>
+          <div class="mode-card-desc">Solo or squad defense against escalating waves of armored tactical squads.</div>
         </div>
       </div>
 
@@ -1169,6 +1185,27 @@
       infammo: false
     };
 
+    const gameState = {
+      active: false,
+      paused: false,
+      gameOver: false,
+      mode: 'BR',
+      operator: 'GHOST',
+      playerName: localStorage.getItem('tfv_callsign') || 'VANGUARD-1',
+      wave: 1,
+      score: 0,
+      kills: 0,
+      streak: 0,
+      uavActive: false,
+      overdriveActive: false,
+      brAlive: 100,
+      brZoneRadius: 72,
+      brZoneTarget: 72,
+      brPhase: 1,
+      brTimer: 18,
+      brBotFightTimer: 2.2
+    };
+
     const netState = {
       roomCode: '',
       isHost: false,
@@ -1177,6 +1214,11 @@
       peers: new Map(),
       lastSync: 0
     };
+
+    function getPlayerCallsign() {
+      const raw = (gameState.playerName || '').trim().toUpperCase();
+      return raw.length > 0 ? raw.slice(0, 16) : 'VANGUARD-1';
+    }
 
     function generateRoomCode() {
       const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
@@ -1200,10 +1242,10 @@
         if (typeof BroadcastChannel !== 'undefined') {
           netState.channel = new BroadcastChannel('tfv-room-' + code);
           netState.channel.onmessage = (ev) => handleNetMessage(ev.data);
-          broadcastNet({ type: 'HELLO', id: netState.playerId, op: gameState.operator });
+          broadcastNet({ type: 'HELLO', id: netState.playerId, op: gameState.operator, name: getPlayerCallsign() });
           document.getElementById('mp-status').textContent = asHost
-            ? `Status: Private Room ${code} Created! Share code with friends.`
-            : `Status: Connected to Private Room ${code}! Waiting for host or deploy.`;
+            ? `Status: Private Room ${code} Created by ${getPlayerCallsign()}! Share code with friends.`
+            : `Status: ${getPlayerCallsign()} connected to Private Room ${code}!`;
         } else {
           document.getElementById('mp-status').textContent = `Status: Room ${code} Active (Local Mode).`;
         }
@@ -1221,11 +1263,12 @@
 
     function handleNetMessage(msg) {
       if (!msg || msg.id === netState.playerId) return;
+      const peerName = (msg.name || msg.op || 'SQUADMATE').toUpperCase();
       if (msg.type === 'HELLO') {
-        document.getElementById('mp-status').textContent = `Status: Friend (${msg.op}) joined Room ${netState.roomCode}!`;
-        broadcastNet({ type: 'WELCOME', id: netState.playerId, op: gameState.operator });
+        document.getElementById('mp-status').textContent = `Status: ${peerName} (${msg.op}) joined Room ${netState.roomCode}!`;
+        broadcastNet({ type: 'WELCOME', id: netState.playerId, op: gameState.operator, name: getPlayerCallsign() });
       } else if (msg.type === 'WELCOME') {
-        document.getElementById('mp-status').textContent = `Status: Connected with Squadmate (${msg.op}) in ${netState.roomCode}!`;
+        document.getElementById('mp-status').textContent = `Status: Connected with ${peerName} (${msg.op}) in ${netState.roomCode}!`;
       } else if (msg.type === 'START_MATCH' && !gameState.active) {
         gameState.mode = msg.mode || 'BR';
         startMatch();
@@ -1566,7 +1609,7 @@
     viewmodelRoot.add(pistolMesh);
 
     // =========================================================================
-    // 6. UPGRADED 3D HUMANOID SOLDIER RIGS & GAME STATE
+    // 6. UPGRADED 3D HUMANOID SOLDIER RIGS & FLOATING HEALTH/SHIELD BARS
     // =========================================================================
     function buildCharacterMesh(operatorId = 'GHOST', isEnemy = true) {
       const op = OPERATORS[operatorId] || OPERATORS.GHOST;
@@ -1678,25 +1721,72 @@
       return group;
     }
 
-    const gameState = {
-      active: false,
-      paused: false,
-      gameOver: false,
-      mode: 'BR',
-      operator: 'GHOST',
-      wave: 1,
-      score: 0,
-      kills: 0,
-      streak: 0,
-      uavActive: false,
-      overdriveActive: false,
-      brAlive: 100,
-      brZoneRadius: 72,
-      brZoneTarget: 72,
-      brPhase: 1,
-      brTimer: 18,
-      brBotFightTimer: 2.2
-    };
+    // Floating 3D Overhead Health (100 HP) + Shield (50 Shield) & Nameplate Sprite
+    function createOverheadStatusSprite(label, hp = 100, maxHp = 100, shield = 50, maxShield = 50, isSquadmate = false) {
+      const c = document.createElement('canvas');
+      c.width = 256;
+      c.height = 84;
+      const ctx = c.getContext('2d');
+      const tex = new THREE.CanvasTexture(c);
+      tex.minFilter = THREE.LinearFilter;
+
+      const mat = new THREE.SpriteMaterial({
+        map: tex,
+        transparent: true,
+        depthTest: false
+      });
+      const sprite = new THREE.Sprite(mat);
+      sprite.scale.set(1.65, 0.54, 1);
+      sprite.position.set(0, 2.28, 0);
+
+      sprite.userData = { canvas: c, ctx, tex, label, isSquadmate };
+      updateOverheadStatusSprite(sprite, hp, maxHp, shield, maxShield, label);
+      return sprite;
+    }
+
+    function updateOverheadStatusSprite(sprite, hp, maxHp, shield, maxShield, newLabel = null) {
+      if (!sprite || !sprite.userData) return;
+      const { canvas, ctx, tex, isSquadmate } = sprite.userData;
+      if (newLabel) sprite.userData.label = newLabel;
+      const label = sprite.userData.label;
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Nameplate
+      ctx.font = 'bold 21px "JetBrains Mono", monospace';
+      ctx.textAlign = 'center';
+      ctx.fillStyle = isSquadmate ? '#38bdf8' : '#f8fafc';
+      ctx.shadowColor = 'rgba(0, 0, 0, 0.95)';
+      ctx.shadowBlur = 6;
+      ctx.fillText(label, 128, 24);
+      ctx.shadowBlur = 0;
+
+      const barX = 28;
+      const barW = 200;
+
+      // Shield Bar (50 Shield - Cyan)
+      if (maxShield > 0) {
+        const shRatio = Math.max(0, Math.min(1, shield / maxShield));
+        ctx.fillStyle = 'rgba(15, 23, 42, 0.88)';
+        ctx.fillRect(barX - 2, 32, barW + 4, 13);
+        ctx.fillStyle = '#38bdf8';
+        ctx.fillRect(barX, 34, barW * shRatio, 9);
+      }
+
+      // Health Bar (100 HP - Green/Amber/Red)
+      const hpRatio = Math.max(0, Math.min(1, hp / maxHp));
+      ctx.fillStyle = 'rgba(15, 23, 42, 0.88)';
+      ctx.fillRect(barX - 2, 47, barW + 4, 16);
+      ctx.fillStyle = hpRatio > 0.5 ? '#22c55e' : (hpRatio > 0.25 ? '#f59e0b' : '#ef4444');
+      ctx.fillRect(barX, 49, barW * hpRatio, 12);
+
+      // Numeric HP + Shield Readout
+      ctx.font = 'bold 13px "JetBrains Mono", monospace';
+      ctx.fillStyle = '#e2e8f0';
+      ctx.fillText(`${Math.ceil(hp)} HP | ${Math.ceil(shield)} SHD`, 128, 77);
+
+      tex.needsUpdate = true;
+    }
 
     const player = {
       pos: new THREE.Vector3(0, 1.72, 16),
@@ -1774,15 +1864,25 @@
       const opType = opKeys[Math.floor(Math.random() * opKeys.length)];
       const mesh = buildCharacterMesh(opType, true);
       mesh.position.copy(pos);
+
+      const botId = 'BOT-' + String(botSerial++).padStart(3, '0');
+      const baseHp = 100;
+      const baseShield = 50;
+
+      const statusSprite = createOverheadStatusSprite(botId, baseHp, baseHp, baseShield, baseShield, false);
+      mesh.add(statusSprite);
+
       scene.add(mesh);
 
-      const baseHp = gameState.mode === 'BR' ? 100 : 85 + gameState.wave * 12;
       enemies.push({
-        id: 'BOT-' + String(botSerial++).padStart(3, '0'),
+        id: botId,
         mesh,
+        statusSprite,
         pos,
         hp: baseHp,
         maxHp: baseHp,
+        shield: baseShield,
+        maxShield: baseShield,
         speed: 4.2 + Math.random() * 1.4,
         fireCooldown: 0.6 + Math.random() * 1.1,
         strafeDir: Math.random() > 0.5 ? 1 : -1,
@@ -1827,14 +1927,45 @@
       setTimeout(() => banner.classList.remove('visible'), duration);
     }
 
-    function triggerHitmarker(isKill = false) {
+    function triggerHitmarker(isKill = false, isShield = false) {
       const hm = document.getElementById('hitmarker');
       hm.classList.remove('active', 'kill');
       void hm.offsetWidth;
       hm.classList.add('active');
       if (isKill) hm.classList.add('kill');
+      hm.style.filter = isShield && !isKill ? 'drop-shadow(0 0 6px #38bdf8)' : 'none';
       audio.playHitmarker(isKill);
-      setTimeout(() => hm.classList.remove('active', 'kill'), 130);
+      setTimeout(() => {
+        hm.classList.remove('active', 'kill');
+        hm.style.filter = 'none';
+      }, 130);
+    }
+
+    function damageBot(enemyIdx, amount, attackerName = 'YOU', isHeadshot = false) {
+      const e = enemies[enemyIdx];
+      if (!e) return;
+
+      let remaining = amount;
+      let hitShield = false;
+
+      if (e.shield > 0) {
+        hitShield = true;
+        const absorbed = Math.min(e.shield, remaining);
+        e.shield -= absorbed;
+        remaining -= absorbed;
+      }
+
+      if (remaining > 0) {
+        e.hp = Math.max(0, e.hp - remaining);
+      }
+
+      updateOverheadStatusSprite(e.statusSprite, e.hp, e.maxHp, e.shield, e.maxShield);
+
+      if (e.hp <= 0) {
+        eliminateEnemy(enemyIdx, attackerName, isHeadshot);
+      } else if (attackerName === 'YOU') {
+        triggerHitmarker(false, hitShield);
+      }
     }
 
     function eliminateEnemy(idx, killerName = 'YOU', isHeadshot = false) {
@@ -1843,12 +1974,14 @@
       scene.remove(enemy.mesh);
       enemies.splice(idx, 1);
 
+      const displayKiller = killerName === 'YOU' ? getPlayerCallsign() : killerName;
+
       if (killerName === 'YOU') {
         gameState.kills++;
         gameState.streak++;
         gameState.score += isHeadshot ? 250 : 150;
-        triggerHitmarker(true);
-        addKillfeedEntry(`YOU ELIMINATED ${enemy.id}${isHeadshot ? ' [HEADSHOT]' : ''}`, isHeadshot);
+        triggerHitmarker(true, false);
+        addKillfeedEntry(`${displayKiller} ELIMINATED ${enemy.id}${isHeadshot ? ' [HEADSHOT]' : ''}`, isHeadshot);
 
         if (gameState.streak >= 3 && !gameState.uavActive) {
           gameState.uavActive = true;
@@ -1861,7 +1994,7 @@
           showBanner('5-KILLSTREAK: OVERDRIVE', '+35% WEAPON DAMAGE & FIRE RATE');
         }
       } else {
-        addKillfeedEntry(`${killerName} ELIMINATED ${enemy.id}`, false);
+        addKillfeedEntry(`${displayKiller} ELIMINATED ${enemy.id}`, false);
       }
 
       if (gameState.mode === 'BR') {
@@ -2000,12 +2133,7 @@
       if (hitEnemyIdx !== -1) {
         const dmgMult = (isHeadshot ? w.headshotMult : 1.0) * (gameState.overdriveActive ? 1.35 : 1.0);
         const dmg = Math.round(w.damage * dmgMult);
-        enemies[hitEnemyIdx].hp -= dmg;
-        if (enemies[hitEnemyIdx].hp <= 0) {
-          eliminateEnemy(hitEnemyIdx, 'YOU', isHeadshot);
-        } else {
-          triggerHitmarker(false);
-        }
+        damageBot(hitEnemyIdx, dmg, 'YOU', isHeadshot);
       }
     }
 
@@ -2060,7 +2188,7 @@
       const op = OPERATORS[gameState.operator] || OPERATORS.GHOST;
       sleeveMat.color.setHex(op.sleeveColor);
       gloveMat.color.setHex(op.gloveColor);
-      document.getElementById('hud-operator-label').textContent = `${op.name} // ${op.role}`;
+      document.getElementById('hud-operator-label').textContent = `${getPlayerCallsign()} // ${op.name}`;
     }
 
     function startMatch() {
@@ -2246,6 +2374,19 @@
     document.getElementById('lobby-admin-btn').addEventListener('click', toggleAdminPanel);
     document.getElementById('close-admin-btn').addEventListener('click', toggleAdminPanel);
 
+    // Callsign input setup
+    const playerNameInput = document.getElementById('player-name-input');
+    const callsignPreviewBadge = document.getElementById('callsign-preview-badge');
+    playerNameInput.value = gameState.playerName;
+    callsignPreviewBadge.textContent = `ID: ${getPlayerCallsign()}`;
+
+    playerNameInput.addEventListener('input', () => {
+      const cleaned = playerNameInput.value.toUpperCase().replace(/[^A-Z0-9_\- ]/g, '').slice(0, 16);
+      gameState.playerName = cleaned || 'VANGUARD-1';
+      localStorage.setItem('tfv_callsign', gameState.playerName);
+      callsignPreviewBadge.textContent = `ID: ${getPlayerCallsign()}`;
+    });
+
     // Mode & Operator selection
     document.querySelectorAll('.mode-card').forEach(card => {
       card.addEventListener('click', () => {
@@ -2412,11 +2553,15 @@
         espCtx.lineWidth = 2;
         espCtx.strokeRect(sx - boxW / 2, syTop, boxW, boxH);
 
-        // Health Bar & Distance Tag
+        // Health + Shield Bar & Distance Tag
         const dist = Math.round(player.pos.distanceTo(e.pos));
         const hpRatio = Math.max(0, e.hp / e.maxHp);
+        const shRatio = Math.max(0, e.shield / e.maxShield);
+
         espCtx.fillStyle = '#22c55e';
         espCtx.fillRect(sx - boxW / 2 - 6, syTop + boxH * (1 - hpRatio), 3, boxH * hpRatio);
+        espCtx.fillStyle = '#38bdf8';
+        espCtx.fillRect(sx - boxW / 2 - 11, syTop + boxH * (1 - shRatio), 3, boxH * shRatio);
 
         espCtx.font = 'bold 11px "JetBrains Mono", monospace';
         espCtx.fillStyle = '#fca5a5';
@@ -2482,7 +2627,6 @@
     }
 
     function updateHUD() {
-      // Safe Compass Calculation (Zero NaN guaranteed)
       const safeYaw = Number.isFinite(player.yaw) ? player.yaw : 0;
       const deg = ((Math.round((-safeYaw * 180) / Math.PI) % 360) + 360) % 360;
       const dirs = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'];
@@ -2494,7 +2638,6 @@
       document.getElementById('compass-deg').textContent = `${dirs[idx]} ${String(deg).padStart(3, '0')}°`;
       document.getElementById('compass-right').textContent = dirs[rightIdx];
 
-      // Health & Weapon Readout
       document.getElementById('health-val').textContent = Math.ceil(player.hp);
       const hpPct = Math.max(0, Math.min(100, (player.hp / player.maxHp) * 100));
       const hpFill = document.getElementById('health-bar-fill');
@@ -2540,7 +2683,6 @@
       lastFrameTime = now;
       const dt = Number.isFinite(rawDt) ? Math.max(0.001, Math.min(rawDt, 0.05)) : 0.016;
 
-      // Guard against any NaN corruption
       if (!Number.isFinite(player.yaw)) player.yaw = 0;
       if (!Number.isFinite(player.pitch)) player.pitch = 0;
       if (!Number.isFinite(player.pos.x) || !Number.isFinite(player.pos.z)) {
@@ -2668,7 +2810,6 @@
             document.getElementById('gas-vignette').style.opacity = '0';
           }
 
-          // Distant off-screen BR eliminations so 100 players narrow down naturally
           gameState.brBotFightTimer -= dt;
           if (gameState.brBotFightTimer <= 0 && gameState.brAlive > enemies.length + 1) {
             gameState.brBotFightTimer = 1.4 + Math.random() * 1.8;
@@ -2687,7 +2828,6 @@
           const toPlayer = new THREE.Vector3().subVectors(player.pos, e.pos);
           const distToPlayer = Math.hypot(toPlayer.x, toPlayer.z);
 
-          // In BR mode, find closest rival bot to fight as well
           let targetPos = player.pos;
           let targetEnemyIdx = -1;
           let bestDist = distToPlayer;
@@ -2745,11 +2885,9 @@
             if (hasLineOfSight(muzzle, aimPoint)) {
               spawnTracer(muzzle, aimPoint, 0xef4444);
               if (targetEnemyIdx !== -1 && enemies[targetEnemyIdx]) {
-                enemies[targetEnemyIdx].hp -= 26;
-                if (enemies[targetEnemyIdx].hp <= 0) {
-                  eliminateEnemy(targetEnemyIdx, e.id, false);
-                  if (targetEnemyIdx < i) i--;
-                }
+                const countBefore = enemies.length;
+                damageBot(targetEnemyIdx, 26, e.id, false);
+                if (enemies.length < countBefore && targetEnemyIdx < i) i--;
               } else if (Math.random() < 0.34) {
                 applyDamageToPlayer(11);
               }
@@ -2763,6 +2901,7 @@
           broadcastNet({
             type: 'STATE',
             id: netState.playerId,
+            name: getPlayerCallsign(),
             op: gameState.operator,
             x: player.pos.x,
             y: player.pos.y - 1.72,
@@ -2789,12 +2928,17 @@
     }
 
     function updateRemotePeer(msg) {
+      const peerName = (msg.name || msg.op || 'SQUADMATE').toUpperCase();
       let peer = netState.peers.get(msg.id);
       if (!peer) {
         const mesh = buildCharacterMesh(msg.op || 'GHOST', false);
+        const badge = createOverheadStatusSprite(peerName, 100, 100, 50, 50, true);
+        mesh.add(badge);
         scene.add(mesh);
-        peer = { mesh };
+        peer = { mesh, badge };
         netState.peers.set(msg.id, peer);
+      } else if (peer.badge) {
+        updateOverheadStatusSprite(peer.badge, 100, 100, 50, 50, peerName);
       }
       peer.mesh.position.set(msg.x || 0, msg.y || 0, msg.z || 0);
       peer.mesh.rotation.y = (msg.yaw || 0) + Math.PI;
