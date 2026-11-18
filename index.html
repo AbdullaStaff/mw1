@@ -1181,7 +1181,7 @@
     const audio = new TacticalAudio();
 
     // =========================================================================
-    // 2. GAME CONFIGURATION, OPERATORS, CALLSIGN & RELIABLE CROSS-DEVICE SYNC
+    // 2. GAME CONFIGURATION, OPERATORS, CALLSIGN & TURN-RELAY CROSS-DEVICE SYNC
     // =========================================================================
     const OPERATORS = {
       GHOST: {
@@ -1375,14 +1375,13 @@
       document.getElementById('hud-room-badge').textContent = `PRIVATE: ${code}`;
       updateLobbyRosterUI();
 
-      // Update browser URL so copying link shares the room code
       try {
         const url = new URL(window.location.href);
         url.searchParams.set('room', code);
         window.history.replaceState({}, '', url.toString());
       } catch (e) {}
 
-      // 1. Same-browser / Sandbox BroadcastChannel
+      // 1. Same-device BroadcastChannel
       try {
         if (typeof BroadcastChannel !== 'undefined') {
           netState.channel = new BroadcastChannel('tfv-room-' + code);
@@ -1390,42 +1389,70 @@
         }
       } catch (e) {}
 
-      // 2. Cross-Device WebRTC PeerJS with STUN servers for Mobile/PC NAT traversal
+      // 2. Cross-Device WebRTC PeerJS with STUN + TURN Relay Servers (bypasses strict mobile/router NAT)
       try {
         if (typeof Peer !== 'undefined') {
           const peerId = asHost
-            ? `tfv-room-host-${code}`
-            : `tfv-room-guest-${code}-${netState.playerId}`;
+            ? `tfv-v3-host-${code}`
+            : `tfv-v3-guest-${code}-${netState.playerId}`;
 
           const peer = new Peer(peerId, {
+            host: '0.peerjs.com',
+            port: 443,
+            path: '/',
+            secure: true,
             debug: 0,
             config: {
               iceServers: [
                 { urls: 'stun:stun.l.google.com:19302' },
                 { urls: 'stun:stun1.l.google.com:19302' },
-                { urls: 'stun:stun2.l.google.com:19302' }
-              ]
+                {
+                  urls: 'turn:openrelay.metered.ca:80',
+                  username: 'openrelayproject',
+                  credential: 'openrelayproject'
+                },
+                {
+                  urls: 'turn:openrelay.metered.ca:443',
+                  username: 'openrelayproject',
+                  credential: 'openrelayproject'
+                },
+                {
+                  urls: 'turn:openrelay.metered.ca:443?transport=tcp',
+                  username: 'openrelayproject',
+                  credential: 'openrelayproject'
+                }
+              ],
+              iceTransportPolicy: 'all'
             }
           });
           netState.peer = peer;
 
           const connectToHost = () => {
-            if (!netState.peer || netState.peer.destroyed) return;
-            const hostId = `tfv-room-host-${code}`;
+            if (!netState.peer || netState.peer.destroyed || !netState.peer.open) return;
+            const hostId = `tfv-v3-host-${code}`;
             const existing = netState.connections.get(hostId);
             if (existing && existing.open) return;
 
-            const conn = peer.connect(hostId, { reliable: true });
+            if (existing) {
+              try { existing.close(); } catch (e) {}
+              netState.connections.delete(hostId);
+            }
+
+            const conn = peer.connect(hostId, {
+              reliable: true,
+              serialization: 'json'
+            });
+            netState.connections.set(hostId, conn);
             bindPeerConnection(conn, code, false);
           };
 
           peer.on('open', () => {
             if (asHost) {
               document.getElementById('mp-status').textContent =
-                `Status: Room ${code} ONLINE! Click COPY LINK and send to your friend.`;
+                `Status: Room ${code} ONLINE! Send COPY LINK to your friend.`;
             } else {
               document.getElementById('mp-status').textContent =
-                `Status: Linking to Host ${code}...`;
+                `Status: Signaling Server Ready — Connecting to Host ${code}...`;
               connectToHost();
             }
           });
@@ -1434,22 +1461,28 @@
             bindPeerConnection(incomingConn, code, asHost);
           });
 
-          peer.on('error', (err) => {
-            if (err && err.type === 'unavailable-id' && asHost) {
-              // If host ID is taken, automatically join that room as a guest!
-              document.getElementById('mp-status').textContent =
-                `Status: Room ${code} already exists — joining friend's room...`;
-              setTimeout(() => connectRoomChannel(code, false), 200);
-            } else if (!asHost) {
-              document.getElementById('mp-status').textContent =
-                `Status: Searching for Host ${code}... (Make sure Host clicked CREATE ROOM first)`;
+          peer.on('disconnected', () => {
+            if (netState.peer && !netState.peer.destroyed) {
+              try { netState.peer.reconnect(); } catch (e) {}
             }
           });
 
-          // Heartbeat: keep trying to connect & sync lobby roster every 2s
+          peer.on('error', (err) => {
+            const errType = err && err.type ? err.type : 'network';
+            if (errType === 'unavailable-id' && asHost) {
+              setTimeout(() => connectRoomChannel(code, false), 250);
+            } else if (!asHost) {
+              document.getElementById('mp-status').textContent =
+                `Status: Waiting for Host ${code} (${errType}) — retrying...`;
+            }
+          });
+
           netState.heartbeatTimer = setInterval(() => {
-            if (!asHost && netState.connections.size === 0) {
-              connectToHost();
+            if (!asHost) {
+              const hostConn = netState.connections.get(`tfv-v3-host-${code}`);
+              if (!hostConn || !hostConn.open) {
+                connectToHost();
+              }
             }
             broadcastNet({
               type: 'HELLO',
@@ -1460,7 +1493,7 @@
               mode: gameState.mode,
               isPrivate: true
             });
-          }, 2000);
+          }, 2500);
         }
       } catch (err) {}
 
@@ -1475,8 +1508,8 @@
       });
 
       document.getElementById('mp-status').textContent = asHost
-        ? `Status: Private Room ${code} Created! Share COPY LINK or code ${code} with your friend.`
-        : `Status: Connecting to Private Room ${code}...`;
+        ? `Status: Creating Room ${code} on relay server...`
+        : `Status: Joining Room ${code} on relay server...`;
     }
 
     function broadcastNet(payload) {
